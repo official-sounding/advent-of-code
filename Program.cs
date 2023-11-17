@@ -5,10 +5,12 @@ if (args.Length != 1)
     Environment.Exit(1);
 }
 
-var types = AppDomain.CurrentDomain.GetAssemblies()
+Dictionary<string, Type> types = AppDomain.CurrentDomain.GetAssemblies()
 .SelectMany(s => s.GetTypes())
 .Where(p => typeof(Problem).IsAssignableFrom(p) && p != typeof(Problem))
-.ToDictionary(t => GetSlug(t));
+.Select(t => (slug: GetSlug(t), type: t))
+.Where(tuple => tuple.slug != null)
+.ToDictionary(t => t.slug ?? "", t => t.type);
 
 
 Console.WriteLine($"Enumerated {types.Count} implementations");
@@ -42,21 +44,21 @@ else
 
 
 
-static string GetSlug(Type t)
+static string? GetSlug(Type t)
 {
     // Get instance of the attribute.
     var attr = Attribute.GetCustomAttribute(t, typeof(SlugAttribute)) as SlugAttribute;
 
-    if (attr == null)
-    {
-        throw new Exception($"No Slug Attribute defined on {t.FullName}");
-    }
-    else if (string.IsNullOrEmpty(attr.Name))
-    {
-        throw new Exception($"Invalid slug defined on {t.FullName}");
-    }
+    // if (attr == null)
+    // {
+    //     throw new Exception($"No Slug Attribute defined on {t.FullName}");
+    // }
+    // else if (string.IsNullOrEmpty(attr.Name))
+    // {
+    //     throw new Exception($"Invalid slug defined on {t.FullName}");
+    // }
 
-    return attr.Name;
+    return attr?.Name;
 }
 
 
