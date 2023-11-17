@@ -2,7 +2,7 @@
 [Slug("2022/d13")]
 public class Day13 : SyncProblem
 {
-    public override int RunPartOneSync(string[] input)
+    public override string RunPartOneSync(string[] input)
     {
 
         var sum = 0;
@@ -22,10 +22,10 @@ public class Day13 : SyncProblem
             pairs++;
         }
 
-        return sum;
+        return $"{sum}";
     }
 
-    public override int RunPartTwoSync(string[] input)
+    public override string RunPartTwoSync(string[] input)
     {
         var items = new List<Item>();
         var inputIndex = 0;
@@ -52,7 +52,7 @@ public class Day13 : SyncProblem
         // Sort list
         items.Sort(Compare);
 
-        return (items.IndexOf(a) + 1) * (items.IndexOf(b) + 1);
+        return $"{(items.IndexOf(a) + 1) * (items.IndexOf(b) + 1)}";
     }
 
     static Item Parse(ReadOnlySpan<char> input)
@@ -181,7 +181,7 @@ public class Day13 : SyncProblem
     }
     class ListItem : Item
     {
-        public ListItem() { }
+        public ListItem() { Val = new List<Item>(); }
         public ListItem(Item item) { Val = new List<Item> { item }; }
         public ListItem(IEnumerable<Item> items) { Val = items.ToList(); }
         public List<Item> Val { get; init; }

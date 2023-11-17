@@ -1,21 +1,25 @@
-public abstract class Problem {
-    public abstract Task<int> RunPartOne(string[] input);
-    public virtual Task<int> RunPartTwo(string[] input)
+public abstract class Problem
+{
+    public abstract Task<string> RunPartOne(string[] input);
+    public virtual Task<string> RunPartTwo(string[] input)
     {
         Console.WriteLine("Part Two Not Implemented");
-        return Task.FromResult(0);
+        return Task.FromResult(string.Empty);
     }
 }
 
-public abstract class SyncProblem : Problem {
-    public abstract int RunPartOneSync(string[] input);
-    public virtual int RunPartTwoSync(string[] input) => 0;
+public abstract class SyncProblem : Problem
+{
+    public abstract string RunPartOneSync(string[] input);
+    public virtual string RunPartTwoSync(string[] input) => string.Empty;
 
-    public override Task<int> RunPartOne(string[] input) {
+    public override Task<string> RunPartOne(string[] input)
+    {
         return Task.FromResult(RunPartOneSync(input));
     }
 
-    public override Task<int> RunPartTwo(string[] input) {
+    public override Task<string> RunPartTwo(string[] input)
+    {
         return Task.FromResult(RunPartTwoSync(input));
     }
 }
