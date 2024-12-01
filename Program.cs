@@ -1,5 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Diagnostics;
+using System.Net;
 
 if (args.Length != 1)
 {
@@ -42,17 +43,31 @@ if (File.Exists($"input/{slug}-example.txt"))
 
 if (Activator.CreateInstance(type) is AsyncProblem problem)
 {
-    Console.WriteLine($"Reading input for {slug}");
+    var file = Path.Combine("input", $"{SlugToPath(slug)}.txt");
+    if (!File.Exists(file))
+    {
+        Console.WriteLine($"for {slug}, {file} does not exist, pulling");
+        using var client = BuildClient();
+        var parts = slug.Split('/');
+        var year = parts[0];
+        var day = Convert.ToInt32(parts[1][1..]);
+        var url = $"/{year}/day/{day}/input";
+        Console.WriteLine($"Downloading from {url}");
+        var res = await client.GetAsync(url);
 
-    var input = await File.ReadAllLinesAsync($"input/{slug}.txt");
+        var content = await res.Content.ReadAsStringAsync();
+        await File.WriteAllTextAsync(file, content);
+
+    }
+    Console.WriteLine($"for {slug}, reading input {file}");
+
+    var input = await File.ReadAllLinesAsync(file);
     var sw = new Stopwatch();
-
     sw.Start();
     var part1 = await problem.RunPartOneAsync(input);
     sw.Stop();
 
     Console.WriteLine($"Part 1: {part1} ({sw.ElapsedMilliseconds} ms)");
-
     sw.Restart();
     var part2 = await problem.RunPartTwoAsync(input);
     sw.Stop();
@@ -85,3 +100,18 @@ static string? GetSlug(Type t)
 }
 
 
+static string SlugToPath(string slug)
+{
+    return slug.Replace('/', Path.DirectorySeparatorChar);
+}
+
+
+static HttpClient BuildClient()
+{
+    var sessionCookie = Environment.GetEnvironmentVariable("AOC_SESSION_COOKIE");
+    var baseAddress = new Uri("https://adventofcode.com");
+    var cookieContainer = new CookieContainer();
+    cookieContainer.Add(baseAddress, new Cookie("session", sessionCookie));
+    var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
+    return new HttpClient(handler) { BaseAddress = baseAddress };
+}
