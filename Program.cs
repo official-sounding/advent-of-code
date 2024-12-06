@@ -1,4 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
+using System.Diagnostics;
+
 if (args.Length != 1)
 {
     Console.Error.WriteLine("must supply exactly one param, slug of problem to run");
@@ -43,11 +45,18 @@ if (Activator.CreateInstance(type) is Problem problem)
     Console.WriteLine($"Reading input for {slug}");
 
     var input = await File.ReadAllLinesAsync($"input/{slug}.txt");
+    var sw = new Stopwatch();
 
+    sw.Start();
     var part1 = await problem.RunPartOne(input);
-    Console.WriteLine($"Part 1: {part1}");
+    sw.Stop();
+
+    Console.WriteLine($"Part 1: {part1} ({sw.ElapsedMilliseconds} ms)");
+
+    sw.Restart();
     var part2 = await problem.RunPartTwo(input);
-    Console.WriteLine($"Part 2: {part2}");
+    sw.Stop();
+    Console.WriteLine($"Part 2: {part2} ({sw.ElapsedMilliseconds} ms)");
 }
 else
 {
