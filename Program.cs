@@ -24,6 +24,20 @@ if (!types.TryGetValue(slug, out var type))
     Environment.Exit(2);
 }
 
+if (File.Exists($"input/{slug}-example.txt"))
+{
+    Console.WriteLine($"Example input for {slug} detected, trying that first");
+    var exampleInput = await File.ReadAllLinesAsync($"input/{slug}-example.txt");
+    if (Activator.CreateInstance(type) is Problem example)
+    {
+        var part1 = await example.RunPartOne(exampleInput);
+        Console.WriteLine($"Part 1: {part1}");
+        var part2 = await example.RunPartTwo(exampleInput);
+        Console.WriteLine($"Part 2: {part2}");
+    }
+
+}
+
 if (Activator.CreateInstance(type) is Problem problem)
 {
     Console.WriteLine($"Reading input for {slug}");
