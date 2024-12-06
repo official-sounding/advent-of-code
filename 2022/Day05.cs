@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 
 [Slug("2022/d05")]
-public class Day05 : SyncProblem
+public class Day202205 : SyncProblem
 {
     public override string RunPartOneSync(string[] input)
     {

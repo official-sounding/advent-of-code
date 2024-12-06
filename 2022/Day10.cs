@@ -1,7 +1,7 @@
 using System.Text;
 
 [Slug("2022/d10")]
-public class Day10 : SyncProblem
+public class Day202210 : SyncProblem
 {
     public override string RunPartOneSync(string[] input)
     {

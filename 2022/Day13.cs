@@ -1,6 +1,6 @@
 
 [Slug("2022/d13")]
-public class Day13 : SyncProblem
+public class Day202213 : SyncProblem
 {
     public override string RunPartOneSync(string[] input)
     {
