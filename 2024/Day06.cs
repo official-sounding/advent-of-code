@@ -6,7 +6,7 @@ public enum GuardOrientation
     Right
 }
 
-public enum MoveResult 
+public enum MoveResult
 {
     Unvisited,
     Visited,
@@ -14,28 +14,33 @@ public enum MoveResult
     OffMap
 }
 
-public record GuardState(int X, int Y, GuardOrientation Orientation) { 
+public record GuardState(int X, int Y, GuardOrientation Orientation)
+{
 
-    public (int x, int y) Position => (X,Y);
-    (int x,int y) OffsetForDirection => Orientation switch {
-        GuardOrientation.Up => (0,-1),
-        GuardOrientation.Down => (0,1),
-        GuardOrientation.Left => (-1, 0),
-        GuardOrientation.Right => (1,0),
-        _ => (0,0)
+    public Position Position => new(X, Y);
+    Offset OffsetForDirection => Orientation switch
+    {
+        GuardOrientation.Up => Offset.N,
+        GuardOrientation.Down => Offset.S,
+        GuardOrientation.Left => Offset.W,
+        GuardOrientation.Right => Offset.E,
+        _ => Offset.Nil
     };
 
-    public GuardState Move() {
+    public GuardState Move()
+    {
         var offset = OffsetForDirection;
-        return this with { X = X + offset.x, Y = Y + offset.y };
+        return this with { X = X + offset.X, Y = Y + offset.Y };
     }
 
-    public GuardState Rotate() {
-        return Orientation switch {
-            GuardOrientation.Up => this with { Orientation = GuardOrientation.Right},
-            GuardOrientation.Right => this with {Orientation = GuardOrientation.Down},
-            GuardOrientation.Down => this with { Orientation = GuardOrientation.Left},
-            GuardOrientation.Left => this with { Orientation = GuardOrientation.Up},
+    public GuardState Rotate()
+    {
+        return Orientation switch
+        {
+            GuardOrientation.Up => this with { Orientation = GuardOrientation.Right },
+            GuardOrientation.Right => this with { Orientation = GuardOrientation.Down },
+            GuardOrientation.Down => this with { Orientation = GuardOrientation.Left },
+            GuardOrientation.Left => this with { Orientation = GuardOrientation.Up },
             _ => this
         };
     }
@@ -48,11 +53,15 @@ public class Day202406 : SyncProblem
     private List<GuardState> DistinctStates = new();
     public override string RunPartOneSync(string[] input)
     {
-        var (matrix, guard) = ParseMatrix(input);
+        var matrix = Matrix.Parse(input);
+        var guard = FindGuard(matrix);
+
         DistinctStates.Add(guard);
         var check = CheckMove(matrix, guard);
-        while(check != MoveResult.OffMap) {
-            switch(check) {
+        while (check != MoveResult.OffMap)
+        {
+            switch (check)
+            {
                 case MoveResult.Visited:
                     guard = guard.Move();
                     break;
@@ -65,25 +74,30 @@ public class Day202406 : SyncProblem
                     guard = guard.Rotate();
                     break;
             }
-            
             check = CheckMove(matrix, guard);
         }
 
         return $"{DistinctStates.Count}";
     }
 
-    public override string RunPartTwoSync(string[] input) {
-        var (matrix, initial) = ParseMatrix(input);
-        HashSet<(int,int)> loopPositions = [];
-        
-        foreach(var state in DistinctStates) {
-            if(state.Position == initial.Position) {
+    public override string RunPartTwoSync(string[] input)
+    {
+        var matrix = Matrix.Parse(input);
+        var initial = FindGuard(matrix);
+
+        HashSet<Position> loopPositions = [];
+
+        foreach (var state in DistinctStates)
+        {
+            if (state.Position == initial.Position)
+            {
                 continue;
             }
-            
+
             matrix[state.Position] = '#';
-            
-            if(DoesLoop(matrix, initial)) {
+
+            if (DoesLoop(matrix, initial))
+            {
                 loopPositions.Add(state.Position);
             }
             matrix[state.Position] = '.';
@@ -92,16 +106,20 @@ public class Day202406 : SyncProblem
         return $"{loopPositions.Count}";
     }
 
-    public bool DoesLoop(Dictionary<(int,int), char> matrix, GuardState initial) {
+    public bool DoesLoop(Matrix matrix, GuardState initial)
+    {
         var stateHash = new HashSet<GuardState>() { initial };
         var guard = initial;
         var check = CheckMove(matrix, guard);
-        while(check != MoveResult.OffMap) {
-            switch(check) {
+        while (check != MoveResult.OffMap)
+        {
+            switch (check)
+            {
                 case MoveResult.Visited:
                 case MoveResult.Unvisited:
                     guard = guard.Move();
-                    if(!stateHash.Add(guard)) {
+                    if (!stateHash.Add(guard))
+                    {
                         return true;
                     }
                     break;
@@ -116,28 +134,19 @@ public class Day202406 : SyncProblem
         return false;
     }
 
-    (Dictionary<(int, int), char>, GuardState) ParseMatrix(string[] lines)
+    GuardState FindGuard(Matrix matrix)
     {
-        GuardState guardStart = new(0, 0, GuardOrientation.Up);
-        var guardFound = false;
-        var matrix = lines.SelectMany((l, y) => l.ToCharArray().Select((n, x) => (x, y, n))).ToDictionary((t) =>
-        {
-            var (x, y, v) = t;
-            if (!guardFound && GuardOrientationMap.TryGetValue(v, out var direction))
-            {
-                guardStart = new(x, y, direction);
-                guardFound = true;
-            }
-            return (x, y);
-        }, (t) => t.n);
-
-        return (matrix, guardStart);
+        var ((x, y), value) = matrix.First((kv) => GuardOrientationMap.ContainsKey(kv.Value));
+        return new(x, y, GuardOrientationMap[value]);
     }
 
-    MoveResult CheckMove(Dictionary<(int, int), char> matrix, GuardState guard) {
-        var (x,y, _) = guard.Move();
-        if(matrix.TryGetValue((x,y), out var value)) {
-            return value switch {
+    MoveResult CheckMove(Matrix matrix, GuardState guard)
+    {
+        var (x, y, _) = guard.Move();
+        if (matrix.TryGetValue((x, y), out var value))
+        {
+            return value switch
+            {
                 '.' => MoveResult.Unvisited,
                 '^' => MoveResult.Visited,
                 'X' => MoveResult.Visited,

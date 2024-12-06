@@ -1,40 +1,36 @@
 [Slug("2024/d04")]
 public class Day202404 : SyncProblem
 {
-    private int SearchXMAS(Dictionary<(int,int), char> matrix, (int,int) start) {
-        int count = 0;
-        
-        count += SearchWord(matrix, start, (1,0));
-        count += SearchWord(matrix, start, (0,1));
-        count += SearchWord(matrix, start, (-1,0));
-        count += SearchWord(matrix, start, (0,-1));
-        count += SearchWord(matrix, start, (1,1));
-        count += SearchWord(matrix, start, (-1,-1));
-        count += SearchWord(matrix, start, (-1,1));
-        count += SearchWord(matrix, start, (1,-1));
-        
-
-        return count;   
+    private int SearchXMAS(Matrix matrix, Position start)
+    {
+        return Offset.AllDirections().Sum(o => SearchWord(matrix, start, o));
     }
 
-    private int SearchMAS(Dictionary<(int,int), char> matrix, (int,int) center) {
+    private int SearchMAS(Matrix matrix, Position center)
+    {
         // left diagonal - MAS or SAM
         var ldValid = false;
-        if(matrix.TryGetValue(ApplyOffset(center, (-1,1)), out var ul) && (ul == 'S' || ul == 'M')) {
-            if(matrix.TryGetValue(ApplyOffset(center, (1,-1)), out var lr)) {
-                if((ul == 'S' && lr == 'M') || (ul == 'M' && lr == 'S')) {
+        if (matrix.TryGetValue(center.ApplyOffset(Offset.NW), out var ul) && (ul == 'S' || ul == 'M'))
+        {
+            if (matrix.TryGetValue(center.ApplyOffset(Offset.SE), out var lr))
+            {
+                if ((ul == 'S' && lr == 'M') || (ul == 'M' && lr == 'S'))
+                {
                     ldValid = true;
                 }
             }
         }
 
-        if(!ldValid) { return 0; }
+        if (!ldValid) { return 0; }
 
         // right diagonal
         var rdValid = false;
-        if(matrix.TryGetValue(ApplyOffset(center, (1,1)), out var ur) && (ur == 'S' || ur == 'M')) {
-            if(matrix.TryGetValue(ApplyOffset(center, (-1,-1)), out var ll)) {
-                if((ur == 'S' && ll == 'M') || (ur == 'M' && ll == 'S')) {
+        if (matrix.TryGetValue(center.ApplyOffset(Offset.NE), out var ur) && (ur == 'S' || ur == 'M'))
+        {
+            if (matrix.TryGetValue(center.ApplyOffset(Offset.SW), out var ll))
+            {
+                if ((ur == 'S' && ll == 'M') || (ur == 'M' && ll == 'S'))
+                {
                     rdValid = true;
                 }
             }
@@ -43,14 +39,12 @@ public class Day202404 : SyncProblem
         return rdValid ? 1 : 0;
     }
 
-    private (int,int) ApplyOffset((int x, int y) start, (int x, int y) offset, int num = 1)
+    private int SearchWord(Matrix matrix, Position start, Offset offset)
     {
-        return (start.x + num * offset.x, start.y + num * offset.y);
-    }
-    
-    private int SearchWord(Dictionary<(int, int), char> matrix, (int x,int y) start, (int x,int y) offset)
-    {
-        if(matrix.TryGetValue(start, out var n1) && matrix.TryGetValue(ApplyOffset(start, offset, 1), out var n2) && matrix.TryGetValue(ApplyOffset(start, offset, 2), out var n3) && matrix.TryGetValue(ApplyOffset(start, offset, 3), out var n4))
+        if (matrix.TryGetValue(start, out var n1)
+            && matrix.TryGetValue(start.ApplyOffset(offset), out var n2)
+            && matrix.TryGetValue(start.ApplyOffset(offset, 2), out var n3)
+            && matrix.TryGetValue(start.ApplyOffset(offset, 3), out var n4))
         {
             return $"{n1}{n2}{n3}{n4}" == "XMAS" ? 1 : 0;
         }
@@ -58,26 +52,15 @@ public class Day202404 : SyncProblem
         return 0;
     }
 
-    public Dictionary<(int, int), char> ParseMatrix(string[] lines)
-        {
-            return lines.SelectMany((l, row) => l.ToCharArray().Select((n, col) => (row, col, n))).ToDictionary((t) =>
-            {
-                var (row, col, _) = t;
-                return (row, col);
-            }, (t) => t.n);
-
-        }
-
     public override string RunPartOneSync(string[] input)
     {
-        var matrix = ParseMatrix(input);
+        var matrix = Matrix.Parse(input);
         var count = 0;
-
-        for(int x = 0; x < input.Length; x++) {
-            for(int y = 0; y < input.Length; y++) {
-                if(matrix[(x,y)] == 'X') {
-                    count += SearchXMAS(matrix, (x,y));
-                }
+        foreach (var ((x, y), value) in matrix)
+        {
+            if (value == 'X')
+            {
+                count += SearchXMAS(matrix, new(x, y));
             }
         }
 
@@ -86,13 +69,13 @@ public class Day202404 : SyncProblem
 
     public override string RunPartTwoSync(string[] input)
     {
-        var matrix = ParseMatrix(input);
+        var matrix = Matrix.Parse(input);
         var count = 0;
-        for(int x = 0; x < input.Length; x++) {
-            for(int y = 0; y < input.Length; y++) {
-                if(matrix[(x,y)] == 'A') {
-                    count += SearchMAS(matrix, (x,y));
-                }
+        foreach (var ((x, y), value) in matrix)
+        {
+            if (value == 'A')
+            {
+                count += SearchMAS(matrix, new(x, y));
             }
         }
 
