@@ -1,5 +1,5 @@
 [Slug("2024/d04")]
-public class Day202404 : SyncProblem
+public class Day202404 : Problem
 {
     private int SearchXMAS(Matrix matrix, Position start)
     {
@@ -52,7 +52,7 @@ public class Day202404 : SyncProblem
         return 0;
     }
 
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var matrix = Matrix.Parse(input);
         var count = 0;
@@ -64,10 +64,10 @@ public class Day202404 : SyncProblem
             }
         }
 
-        return $"{count}";
+        return count;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var matrix = Matrix.Parse(input);
         var count = 0;
@@ -79,6 +79,6 @@ public class Day202404 : SyncProblem
             }
         }
 
-        return $"{count}";
+        return count;
     }
 }

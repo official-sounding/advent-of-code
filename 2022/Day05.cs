@@ -1,9 +1,9 @@
 using System.Text.RegularExpressions;
 
 [Slug("2022/d05")]
-public class Day202205 : SyncProblem
+public class Day202205 : AsyncProblem
 {
-    public override string RunPartOneSync(string[] input)
+    public override Task<string> RunPartOneAsync(string[] input)
     {
         var stackRegex = new Regex(@"[\[\]\s]+");
 
@@ -58,10 +58,10 @@ public class Day202205 : SyncProblem
             }
         }
 
-        return string.Join(string.Empty, stacks.Select(s => s.Peek()));
+        return Task.FromResult(string.Join(string.Empty, stacks.Select(s => s.Peek())));
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override Task<string> RunPartTwoAsync(string[] input)
     {
         var stackRegex = new Regex(@"[\[\]\s]+");
 
@@ -123,6 +123,6 @@ public class Day202205 : SyncProblem
             }
         }
 
-        return string.Join(string.Empty, stacks.Select(s => s.Peek()));
+        return Task.FromResult(string.Join(string.Empty, stacks.Select(s => s.Peek())));
     }
 }

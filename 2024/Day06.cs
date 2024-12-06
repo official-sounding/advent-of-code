@@ -47,11 +47,11 @@ public record GuardState(int X, int Y, GuardOrientation Orientation)
 }
 
 [Slug("2024/d06")]
-public class Day202406 : SyncProblem
+public class Day202406 : Problem
 {
     private Dictionary<char, GuardOrientation> GuardOrientationMap = new() { { '^', GuardOrientation.Up }, { 'v', GuardOrientation.Down }, { '<', GuardOrientation.Left }, { '>', GuardOrientation.Right } };
     private List<GuardState> DistinctStates = new();
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var matrix = Matrix.Parse(input);
         var guard = FindGuard(matrix);
@@ -77,10 +77,10 @@ public class Day202406 : SyncProblem
             check = CheckMove(matrix, guard);
         }
 
-        return $"{DistinctStates.Count}";
+        return DistinctStates.Count;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var matrix = Matrix.Parse(input);
         var initial = FindGuard(matrix);
@@ -103,7 +103,7 @@ public class Day202406 : SyncProblem
             matrix[state.Position] = '.';
         }
 
-        return $"{loopPositions.Count}";
+        return loopPositions.Count;
     }
 
     public bool DoesLoop(Matrix matrix, GuardState initial)

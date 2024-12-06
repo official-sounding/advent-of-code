@@ -1,7 +1,7 @@
 [Slug("2022/d03")]
-public class Day202203 : SyncProblem
+public class Day202203 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var result = input.Select(x => SplitLine(x)).Select((halves) =>
 {
@@ -9,10 +9,10 @@ public class Day202203 : SyncProblem
     return first.Intersect(second).First();
 }).Select(Score).Sum();
 
-        return $"{result}";
+        return result;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var result = input
         .Select(x => x.ToCharArray())
@@ -22,7 +22,7 @@ public class Day202203 : SyncProblem
         .Sum()
         ;
 
-        return $"{result}";
+        return result;
     }
 
     static (char[], char[]) SplitLine(string x)

@@ -1,5 +1,5 @@
 [Slug("2024/d02")]
-public class Day202402 : SyncProblem
+public class Day202402 : Problem
 {
     private IEnumerable<List<int>> ExtractNumbers(string[] input) => input
          .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries).Select(c => Convert.ToInt32(c)).ToList());
@@ -52,16 +52,16 @@ public class Day202402 : SyncProblem
     }
 
 
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var nums = ExtractNumbers(input);
 
         var result = nums.Where(ValidRow).Count();
 
-        return $"{result}";
+        return result;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var nums = ExtractNumbers(input);
 
@@ -81,6 +81,6 @@ public class Day202402 : SyncProblem
             return false;
         }).Count();
 
-        return $"{result}";
+        return result;
     }
 }

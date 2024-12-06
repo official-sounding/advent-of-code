@@ -1,16 +1,16 @@
 [Slug("2022/d04")]
-public class Day202204 : SyncProblem
+public class Day202204 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var result = input.Select(Parse).Where(FullyContains).Count();
-        return $"{result}";
+        return result;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var result = input.Select(Parse).Where(AnyOverlap).Count();
-        return $"{result}";
+        return result;
     }
 
     static ((int, int), (int, int)) Parse(string line)

@@ -9,7 +9,7 @@ if (args.Length != 1)
 
 Dictionary<string, Type> types = AppDomain.CurrentDomain.GetAssemblies()
 .SelectMany(s => s.GetTypes())
-.Where(p => typeof(Problem).IsAssignableFrom(p) && p != typeof(Problem))
+.Where(p => typeof(AsyncProblem).IsAssignableFrom(p) && p != typeof(AsyncProblem))
 .Select(t => (slug: GetSlug(t), type: t))
 .Where(tuple => tuple.slug != null)
 .ToDictionary(t => t.slug ?? "", t => t.type);
@@ -30,17 +30,17 @@ if (File.Exists($"input/{slug}-example.txt"))
 {
     Console.WriteLine($"Example input for {slug} detected, trying that first");
     var exampleInput = await File.ReadAllLinesAsync($"input/{slug}-example.txt");
-    if (Activator.CreateInstance(type) is Problem example)
+    if (Activator.CreateInstance(type) is AsyncProblem example)
     {
-        var part1 = await example.RunPartOne(exampleInput);
+        var part1 = await example.RunPartOneAsync(exampleInput);
         Console.WriteLine($"Part 1: {part1}");
-        var part2 = await example.RunPartTwo(exampleInput);
+        var part2 = await example.RunPartTwoAsync(exampleInput);
         Console.WriteLine($"Part 2: {part2}");
     }
 
 }
 
-if (Activator.CreateInstance(type) is Problem problem)
+if (Activator.CreateInstance(type) is AsyncProblem problem)
 {
     Console.WriteLine($"Reading input for {slug}");
 
@@ -48,13 +48,13 @@ if (Activator.CreateInstance(type) is Problem problem)
     var sw = new Stopwatch();
 
     sw.Start();
-    var part1 = await problem.RunPartOne(input);
+    var part1 = await problem.RunPartOneAsync(input);
     sw.Stop();
 
     Console.WriteLine($"Part 1: {part1} ({sw.ElapsedMilliseconds} ms)");
 
     sw.Restart();
-    var part2 = await problem.RunPartTwo(input);
+    var part2 = await problem.RunPartTwoAsync(input);
     sw.Stop();
     Console.WriteLine($"Part 2: {part2} ({sw.ElapsedMilliseconds} ms)");
 }

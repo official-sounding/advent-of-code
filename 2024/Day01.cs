@@ -1,5 +1,5 @@
 [Slug("2024/d01")]
-public class Day202401 : SyncProblem
+public class Day202401 : Problem
 {
     private (List<int>, List<int>) ExtractNumbers(string[] input) => input
          .Select(line => line.Split(' ', StringSplitOptions.RemoveEmptyEntries))
@@ -12,7 +12,7 @@ public class Day202401 : SyncProblem
              return (a, b);
          });
 
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var (left, right) = ExtractNumbers(input);
 
@@ -20,21 +20,17 @@ public class Day202401 : SyncProblem
         left = left.Order().ToList();
         right = right.Order().ToList();
 
-        var result = left.Select((l, i) => Math.Abs(l - right[i])).Sum();
-
-        return $"{result}";
+        return left.Select((l, i) => Math.Abs(l - right[i])).Sum();
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var (left, right) = ExtractNumbers(input);
 
         var rDict = right.GroupBy(r => r).ToDictionary(grp => grp.Key, grp => grp.Count());
 
-        var result = left.Sum((l) =>
+        return left.Sum((l) =>
             l * rDict.GetValueOrDefault(l, 0)
         );
-
-        return $"{result}";
     }
 }

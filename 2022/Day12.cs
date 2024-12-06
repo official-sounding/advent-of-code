@@ -1,7 +1,7 @@
 [Slug("2022/d12")]
-public class Day202212 : SyncProblem
+public class Day202212 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         int[,] heights = new int[input.Length, input[0].Length];
         var vertexCount = input.Length * input[0].Length;
@@ -37,12 +37,10 @@ public class Day202212 : SyncProblem
 
         var grid = new Grid(heights, input.Length, input[0].Length);
 
-        var part1 = FindShortedPath(grid, source, target);
-
-        return $"{part1}";
+        return FindShortedPath(grid, source, target);
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         int[,] heights = new int[input.Length, input[0].Length];
         var vertexCount = input.Length * input[0].Length;
@@ -75,11 +73,7 @@ public class Day202212 : SyncProblem
         }
 
         var grid = new Grid(heights, input.Length, input[0].Length);
-        var part2 = aValues.Select(src => FindShortedPath(grid, src, target)).Min();
-
-        return $"{part2}";
-
-
+        return aValues.Select(src => FindShortedPath(grid, src, target)).Min();
     }
 
     static int FindShortedPath(Grid grid, (int, int) source, (int, int) target)

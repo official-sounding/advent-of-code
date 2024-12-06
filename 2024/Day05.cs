@@ -22,17 +22,21 @@ public record PrintUpdate(int[] Pages, int Middle)
     }
 }
 
-public class UpdateComparer(Dictionary<int, PrintRules> rules) : Comparer<int> {
+public class UpdateComparer(Dictionary<int, PrintRules> rules) : Comparer<int>
+{
     private readonly Dictionary<int, PrintRules> rules = rules;
 
     public override int Compare(int x, int y)
     {
-        if(this.rules.TryGetValue(x, out var rules)) {
-            if(rules.Befores.Contains(y)) {
+        if (this.rules.TryGetValue(x, out var rules))
+        {
+            if (rules.Befores.Contains(y))
+            {
                 return 1;
             }
 
-            if(rules.Afters.Contains(y)) {
+            if (rules.Afters.Contains(y))
+            {
                 return -1;
             }
         }
@@ -42,9 +46,9 @@ public class UpdateComparer(Dictionary<int, PrintRules> rules) : Comparer<int> {
 }
 
 [Slug("2024/d05")]
-public class Day202405 : SyncProblem
+public class Day202405 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var rules = new Dictionary<int, HashSet<int>>();
         var updates = new List<PrintUpdate>();
@@ -89,10 +93,10 @@ public class Day202405 : SyncProblem
             }
         }
 
-        return $"{result}";
+        return result;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var rules = new Dictionary<int, PrintRules>();
         var updates = new List<PrintUpdate>();
@@ -140,10 +144,10 @@ public class Day202405 : SyncProblem
             if (!valid)
             {
                 var sorted = pages.Order(comparer).ToArray();
-                result += sorted[sorted.Length /2];
+                result += sorted[sorted.Length / 2];
             }
         }
 
-        return $"{result}";
+        return result;
     }
 }

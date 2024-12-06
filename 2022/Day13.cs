@@ -1,8 +1,8 @@
 
 [Slug("2022/d13")]
-public class Day202213 : SyncProblem
+public class Day202213 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
 
         var sum = 0;
@@ -22,10 +22,10 @@ public class Day202213 : SyncProblem
             pairs++;
         }
 
-        return $"{sum}";
+        return sum;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
         var items = new List<Item>();
         var inputIndex = 0;
@@ -52,7 +52,7 @@ public class Day202213 : SyncProblem
         // Sort list
         items.Sort(Compare);
 
-        return $"{(items.IndexOf(a) + 1) * (items.IndexOf(b) + 1)}";
+        return (items.IndexOf(a) + 1) * (items.IndexOf(b) + 1);
     }
 
     static Item Parse(ReadOnlySpan<char> input)

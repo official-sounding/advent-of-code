@@ -1,9 +1,9 @@
 using System.Text;
 
 [Slug("2022/d10")]
-public class Day202210 : SyncProblem
+public class Day202210 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         List<(string, int)> instructions = input.SelectMany(line =>
 {
@@ -45,10 +45,10 @@ public class Day202210 : SyncProblem
             pc = pc + 1;
         }
 
-        return $"{sum}";
+        return sum;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override Task<string> RunPartTwoAsync(string[] input)
     {
         List<(string, int)> instructions = input.SelectMany(line =>
  {
@@ -69,6 +69,7 @@ public class Day202210 : SyncProblem
         // 20th, 60th, 100th, 140th, 180th, and 220th
         var interestingInstructions = new[] { 20, 60, 100, 140, 180, 220 };
         var line = new StringBuilder();
+        line.AppendLine();
 
         foreach (var (instruction, arg) in instructions)
         {
@@ -90,7 +91,7 @@ public class Day202210 : SyncProblem
             pc = pc + 1;
         }
 
-        return line.ToString();
+        return Task.FromResult(line.ToString());
     }
 
     static char CrtOutput(int pc, int x)

@@ -1,7 +1,7 @@
 [Slug("2022/d11")]
-public class Day202211 : SyncProblem
+public class Day202211 : Problem
 {
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var monkeys = input.Select((line) =>
 {
@@ -28,10 +28,10 @@ public class Day202211 : SyncProblem
 
         var sorted = monkeys.OrderByDescending(m => m.InspectionCount).ToList();
 
-        return $"{sorted[0].InspectionCount * sorted[1].InspectionCount}";
+        return sorted[0].InspectionCount * sorted[1].InspectionCount;
 
     }
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
 
         var monkeys = input.Select((line) =>
@@ -68,7 +68,7 @@ public class Day202211 : SyncProblem
             }
         }
         var sorted = monkeys.OrderByDescending(m => m.InspectionCount).ToList();
-        return $"{sorted[0].InspectionCount * sorted[1].InspectionCount}";
+        return sorted[0].InspectionCount * sorted[1].InspectionCount;
 
     }
 

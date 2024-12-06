@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 
 [Slug("2023/d01")]
-public class Day01 : SyncProblem
+public class Day01 : Problem
 {
     private Dictionary<string, string> spelledOut = new Dictionary<string, string>{
         {"one", "o1e"},
@@ -16,7 +16,7 @@ public class Day01 : SyncProblem
     };
 
     private static Regex regex = new Regex("[a-z:]+");
-    public override string RunPartOneSync(string[] input)
+    public override long RunPartOne(string[] input)
     {
         var result = input
             .Select(line => regex.Replace(line, string.Empty))
@@ -24,27 +24,29 @@ public class Day01 : SyncProblem
             .Select(int.Parse)
             .Sum();
 
-        return $"{result}";
+        return result;
     }
 
-    public override string RunPartTwoSync(string[] input)
+    public override long RunPartTwo(string[] input)
     {
-     var result = input
-            .Select(ReplaceSpelledOutNumbers)
-            .Select(line => regex.Replace(line, string.Empty))
-            .Select(line => $"{line.First()}{line.Last()}")
-            .Select(int.Parse)
-            .Sum();
+        var result = input
+               .Select(ReplaceSpelledOutNumbers)
+               .Select(line => regex.Replace(line, string.Empty))
+               .Select(line => $"{line.First()}{line.Last()}")
+               .Select(int.Parse)
+               .Sum();
 
-        return $"{result}";   
+        return result;
     }
 
-    private string ReplaceSpelledOutNumbers(string line) {
+    private string ReplaceSpelledOutNumbers(string line)
+    {
         var result = line;
-        foreach(var (str, num) in spelledOut) {
+        foreach (var (str, num) in spelledOut)
+        {
             result = result.Replace(str, $"{num}");
         }
-        
+
         return result;
     }
 

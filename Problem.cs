@@ -1,25 +1,27 @@
-public abstract class Problem
+public abstract class AsyncProblem
 {
-    public abstract Task<string> RunPartOne(string[] input);
-    public virtual Task<string> RunPartTwo(string[] input)
+    public abstract Task<string> RunPartOneAsync(string[] input);
+    public virtual Task<string> RunPartTwoAsync(string[] input)
     {
         Console.WriteLine("Part Two Not Implemented");
         return Task.FromResult(string.Empty);
     }
 }
 
-public abstract class SyncProblem : Problem
+public abstract class Problem : AsyncProblem
 {
-    public abstract string RunPartOneSync(string[] input);
-    public virtual string RunPartTwoSync(string[] input) => string.Empty;
+    public abstract long RunPartOne(string[] input);
+    public virtual long RunPartTwo(string[] input) => -1;
 
-    public override Task<string> RunPartOne(string[] input)
+    public override Task<string> RunPartOneAsync(string[] input)
     {
-        return Task.FromResult(RunPartOneSync(input));
+        return Task.FromResult($"{RunPartOne(input)}");
     }
 
-    public override Task<string> RunPartTwo(string[] input)
+    public override Task<string> RunPartTwoAsync(string[] input)
     {
-        return Task.FromResult(RunPartTwoSync(input));
+        var result = RunPartTwo(input);
+        var str = result == -1 ? string.Empty : $"{result}";
+        return Task.FromResult(str);
     }
 }
