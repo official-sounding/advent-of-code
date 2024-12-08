@@ -47,6 +47,19 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
 
     public bool ValidPosition((int, int) position) => _matrix.ContainsKey(position);
 
+    public Position FindPosition(char x)
+    {
+        foreach (var (key, value) in _matrix)
+        {
+            if (value == x)
+            {
+                return new(key.Item1, key.Item2);
+            }
+        }
+
+        return new(0, 0);
+    }
+
     public IEnumerator<KeyValuePair<(int, int), char>> GetEnumerator()
     {
         return _matrix.GetEnumerator();
@@ -60,8 +73,8 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
 
 public record Position(int X, int Y)
 {
-    public Position ApplyOffset(Offset o) => this with { X = X + o.X, Y = Y + o.Y };
-    public Position ApplyOffset(Offset o, int scale)
+    Position ApplyOffset(Offset o) => this with { X = X + o.X, Y = Y + o.Y };
+    public Position ApplyOffset(Offset o, int scale = 1)
     {
         var scaled = o.Scale(scale);
         return ApplyOffset(scaled);
@@ -92,5 +105,56 @@ public record Offset(int X, int Y)
         yield return SW;
         yield return W;
         yield return NW;
+    }
+}
+
+public enum Direction
+{
+    N = 0,
+    NE = 1,
+    E = 2,
+    SE = 3,
+    S = 4,
+    SW = 5,
+    W = 6,
+    NW = 7
+}
+
+public static class DirectionExtensions
+{
+    public static Direction RotateLeft90(this Direction dir)
+    {
+        return (Direction)(((int)dir + 2) % 8);
+    }
+
+    public static Direction RotateRight90(this Direction dir)
+    {
+        return (Direction)(((int)dir + 8 - 2) % 8);
+    }
+
+    public static Direction RotateLeft45(this Direction dir)
+    {
+        return (Direction)(((int)dir + 1) % 8);
+    }
+
+    public static Direction RotateRight45(this Direction dir)
+    {
+        return (Direction)(((int)dir + 8 - 1) % 8);
+    }
+
+    public static Offset ToOffset(this Direction dir)
+    {
+        return dir switch
+        {
+            Direction.N => Offset.N,
+            Direction.NE => Offset.NE,
+            Direction.E => Offset.E,
+            Direction.SE => Offset.SE,
+            Direction.S => Offset.S,
+            Direction.SW => Offset.SW,
+            Direction.W => Offset.W,
+            Direction.NW => Offset.NW,
+            _ => throw new Exception($"{dir} invalid")
+        };
     }
 }
