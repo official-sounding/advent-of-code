@@ -46,6 +46,7 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
     }
 
     public bool ValidPosition((int, int) position) => _matrix.ContainsKey(position);
+    public bool ValidPosition(Position position) => _matrix.ContainsKey(position.Tuple);
 
     public Position FindPosition(char x)
     {
@@ -79,6 +80,14 @@ public record Position(int X, int Y)
         var scaled = o.Scale(scale);
         return ApplyOffset(scaled);
     }
+
+    public (int, int) Tuple => (X, Y);
+
+    public static Position operator -(Position me, Position other) => new(Y: me.Y - other.Y, X: me.X - other.X);
+    public static Position operator +(Position me, Position other) => new(Y: me.Y + other.Y, X: me.X + other.X);
+
+    public static Position operator -(Position me, Offset other) => new(Y: me.Y - other.Y, X: me.X - other.X);
+    public static Position operator +(Position me, Offset other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 }
 
 public record Offset(int X, int Y)
