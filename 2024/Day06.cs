@@ -16,21 +16,20 @@ public enum MoveResult
 
 public record GuardState(int X, int Y, GuardOrientation Orientation)
 {
-
     public Position Position => new(X, Y);
-    Offset OffsetForDirection => Orientation switch
+    Position OffsetForDirection => Orientation switch
     {
-        GuardOrientation.Up => Offset.N,
-        GuardOrientation.Down => Offset.S,
-        GuardOrientation.Left => Offset.W,
-        GuardOrientation.Right => Offset.E,
-        _ => Offset.Nil
+        GuardOrientation.Up => Position.N,
+        GuardOrientation.Down => Position.S,
+        GuardOrientation.Left => Position.W,
+        GuardOrientation.Right => Position.E,
+        _ => Position.Nil
     };
 
     public GuardState Move()
     {
-        var offset = OffsetForDirection;
-        return this with { X = X + offset.X, Y = Y + offset.Y };
+        var Position = OffsetForDirection;
+        return this with { X = X + Position.X, Y = Y + Position.Y };
     }
 
     public GuardState Rotate()
@@ -143,7 +142,7 @@ public class Day202406 : Problem
     MoveResult CheckMove(Matrix matrix, GuardState guard)
     {
         var (x, y, _) = guard.Move();
-        if (matrix.TryGetValue((x, y), out var value))
+        if (matrix.TryGetValue(guard.Position, out var value))
         {
             return value switch
             {

@@ -55,7 +55,7 @@ public class Day202408 : Problem
             if (value != '.')
             {
                 var positions = result.GetOrAdd(value, (_) => []);
-                positions.Add(new(key.Item1, key.Item2));
+                positions.Add(key);
             }
         }
 

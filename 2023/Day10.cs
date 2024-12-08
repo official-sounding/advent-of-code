@@ -36,7 +36,7 @@ public class Day202310 : Problem
 
         while (value != 'S')
         {
-            pos = pos.ApplyOffset(dir.ToOffset());
+            pos += dir.ToOffset();
             steps.Add(pos);
             value = matrix[pos];
             dir = CheckDirectionChange(value, dir);
@@ -75,31 +75,17 @@ public class Day202310 : Problem
 
     static Direction FindInitialDirection(Matrix matrix, Position start)
     {
-        var nValid = "F|7";
-        var sValid = "L|J";
-        var wValid = "F-L";
-        var eValid = "7-J";
-        char candidate;
-        if (matrix.TryGetValue(start.ApplyOffset(Offset.N), out candidate) && nValid.Contains(candidate))
-        {
-            return Direction.N;
-        }
+        List<(Direction, string)> dirs = [
+            (Direction.N, "F|7"),
+            (Direction.S, "L|J"),
+            (Direction.W, "F-L"),
+            (Direction.E, "7-J")
+        ];
 
-        if (matrix.TryGetValue(start.ApplyOffset(Offset.S), out candidate) && sValid.Contains(candidate))
+        return dirs.First((o) =>
         {
-            return Direction.S;
-        }
-
-        if (matrix.TryGetValue(start.ApplyOffset(Offset.E), out candidate) && eValid.Contains(candidate))
-        {
-            return Direction.E;
-        }
-
-        if (matrix.TryGetValue(start.ApplyOffset(Offset.W), out candidate) && wValid.Contains(candidate))
-        {
-            return Direction.W;
-        }
-
-        throw new Exception("invalid puzzle");
+            var (dir, valid) = o;
+            return matrix.TryGetValue(start + dir.ToOffset(), out var candidate) && valid.Contains(candidate);
+        }).Item1;
     }
 }

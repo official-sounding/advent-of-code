@@ -1,8 +1,8 @@
 using System.Collections;
 
-public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
+public class Matrix : IEnumerable<KeyValuePair<Position, char>>
 {
-    private Dictionary<(int, int), char> _matrix = [];
+    private Dictionary<Position, char> _matrix = [];
 
     // from input, generates a matrix where (0,0) is the bottom left
     public static Matrix Parse(string[] input)
@@ -15,7 +15,7 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
                 .ToDictionary((t) =>
                     {
                         var (x, y, _) = t;
-                        return (x, y);
+                        return new Position(x, y);
                     }, (t) => t.n
                 )
         };
@@ -23,30 +23,18 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
         return result;
     }
 
-    public char this[(int, int) i]
+    public char this[Position i]
     {
         get => _matrix[i];
         set => _matrix[i] = value;
     }
 
-    public char this[Position i]
-    {
-        get => _matrix[(i.X, i.Y)];
-        set => _matrix[(i.X, i.Y)] = value;
-    }
-
-    public bool TryGetValue((int, int) position, out char value)
+    public bool TryGetValue(Position position, out char value)
     {
         return _matrix.TryGetValue(position, out value);
     }
 
-    public bool TryGetValue(Position position, out char value)
-    {
-        return TryGetValue((position.X, position.Y), out value);
-    }
-
-    public bool ValidPosition((int, int) position) => _matrix.ContainsKey(position);
-    public bool ValidPosition(Position position) => _matrix.ContainsKey(position.Tuple);
+    public bool ValidPosition(Position position) => _matrix.ContainsKey(position);
 
     public Position FindPosition(char x)
     {
@@ -54,14 +42,14 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
         {
             if (value == x)
             {
-                return new(key.Item1, key.Item2);
+                return key;
             }
         }
 
         return new(0, 0);
     }
 
-    public IEnumerator<KeyValuePair<(int, int), char>> GetEnumerator()
+    public IEnumerator<KeyValuePair<Position, char>> GetEnumerator()
     {
         return _matrix.GetEnumerator();
     }
@@ -74,37 +62,28 @@ public class Matrix : IEnumerable<KeyValuePair<(int, int), char>>
 
 public record Position(int X, int Y)
 {
-    Position ApplyOffset(Offset o) => this with { X = X + o.X, Y = Y + o.Y };
-    public Position ApplyOffset(Offset o, int scale = 1)
-    {
-        var scaled = o.Scale(scale);
-        return ApplyOffset(scaled);
-    }
+    public static Position Nil => new(0, 0);
+    public static Position N => new(0, 1);
+    public static Position S => new(0, -1);
+    public static Position E => new(1, 0);
+    public static Position W => new(-1, 0);
+    public static Position NE => new(1, 1);
+    public static Position SE => new(1, -1);
+    public static Position SW => new(-1, -1);
+    public static Position NW => new(-1, 1);
+
+    public Position Scale(int factor) => this with { X = X * factor, Y = Y * factor };
 
     public (int, int) Tuple => (X, Y);
 
     public static Position operator -(Position me, Position other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Position operator +(Position me, Position other) => new(Y: me.Y + other.Y, X: me.X + other.X);
 
-    public static Position operator -(Position me, Offset other) => new(Y: me.Y - other.Y, X: me.X - other.X);
-    public static Position operator +(Position me, Offset other) => new(Y: me.Y + other.Y, X: me.X + other.X);
-}
+    public static implicit operator Position((int, int) b) => FromTuple(b);
 
-public record Offset(int X, int Y)
-{
-    public static Offset Nil => new(0, 0);
-    public static Offset N => new(0, 1);
-    public static Offset S => new(0, -1);
-    public static Offset E => new(1, 0);
-    public static Offset W => new(-1, 0);
-    public static Offset NE => new(1, 1);
-    public static Offset SE => new(1, -1);
-    public static Offset SW => new(-1, -1);
-    public static Offset NW => new(-1, 1);
+    public static Position FromTuple((int, int) b) => new(b.Item1, b.Item2);
 
-    public Offset Scale(int factor) => this with { X = X * factor, Y = Y * factor };
-
-    public static IEnumerable<Offset> AllDirections()
+    public static IEnumerable<Position> AllDirections()
     {
         yield return N;
         yield return NE;
@@ -151,18 +130,18 @@ public static class DirectionExtensions
         return (Direction)(((int)dir + 8 - 1) % 8);
     }
 
-    public static Offset ToOffset(this Direction dir)
+    public static Position ToOffset(this Direction dir)
     {
         return dir switch
         {
-            Direction.N => Offset.N,
-            Direction.NE => Offset.NE,
-            Direction.E => Offset.E,
-            Direction.SE => Offset.SE,
-            Direction.S => Offset.S,
-            Direction.SW => Offset.SW,
-            Direction.W => Offset.W,
-            Direction.NW => Offset.NW,
+            Direction.N => Position.N,
+            Direction.NE => Position.NE,
+            Direction.E => Position.E,
+            Direction.SE => Position.SE,
+            Direction.S => Position.S,
+            Direction.SW => Position.SW,
+            Direction.W => Position.W,
+            Direction.NW => Position.NW,
             _ => throw new Exception($"{dir} invalid")
         };
     }
