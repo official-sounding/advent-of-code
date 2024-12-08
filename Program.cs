@@ -19,7 +19,7 @@ Dictionary<string, Type> types = AppDomain.CurrentDomain.GetAssemblies()
 Console.WriteLine($"Enumerated {types.Count} implementations");
 
 var slug = args[0];
-Console.WriteLine($"Creating an instance of {slug}");
+Console.WriteLine($"Finding impl for {slug}");
 
 if (!types.TryGetValue(slug, out var type))
 {
@@ -27,10 +27,29 @@ if (!types.TryGetValue(slug, out var type))
     Environment.Exit(2);
 }
 
-if (File.Exists($"input/{slug}-example.txt"))
+var inputFile = Path.Combine("input", $"{SlugToPath(slug)}.txt");
+var exampleFile = Path.Combine("examples", $"{SlugToPath(slug)}.txt");
+if (!File.Exists(inputFile))
+{
+    Console.WriteLine($"for {slug}, {inputFile} does not exist, pulling");
+    BuildFolderStructure(inputFile);
+    using var client = BuildClient();
+    var parts = slug.Split('/');
+    var year = parts[0];
+    var day = Convert.ToInt32(parts[1][1..]);
+    var url = $"/{year}/day/{day}/input";
+    Console.WriteLine($"Downloading from {url}");
+    var res = await client.GetAsync(url);
+
+    var content = await res.Content.ReadAsStringAsync();
+    await File.WriteAllTextAsync(inputFile, content);
+
+}
+
+if (File.Exists(exampleFile))
 {
     Console.WriteLine($"Example input for {slug} detected, trying that first");
-    var exampleInput = await File.ReadAllLinesAsync($"input/{slug}-example.txt");
+    var exampleInput = await File.ReadAllLinesAsync(exampleFile);
     if (Activator.CreateInstance(type) is AsyncProblem example)
     {
         var part1 = await example.RunPartOneAsync(exampleInput);
@@ -43,25 +62,9 @@ if (File.Exists($"input/{slug}-example.txt"))
 
 if (Activator.CreateInstance(type) is AsyncProblem problem)
 {
-    var file = Path.Combine("input", $"{SlugToPath(slug)}.txt");
-    if (!File.Exists(file))
-    {
-        Console.WriteLine($"for {slug}, {file} does not exist, pulling");
-        using var client = BuildClient();
-        var parts = slug.Split('/');
-        var year = parts[0];
-        var day = Convert.ToInt32(parts[1][1..]);
-        var url = $"/{year}/day/{day}/input";
-        Console.WriteLine($"Downloading from {url}");
-        var res = await client.GetAsync(url);
+    Console.WriteLine($"for {slug}, reading input {inputFile}");
 
-        var content = await res.Content.ReadAsStringAsync();
-        await File.WriteAllTextAsync(file, content);
-
-    }
-    Console.WriteLine($"for {slug}, reading input {file}");
-
-    var input = await File.ReadAllLinesAsync(file);
+    var input = await File.ReadAllLinesAsync(inputFile);
     var sw = new Stopwatch();
     sw.Start();
     var part1 = await problem.RunPartOneAsync(input);
@@ -114,4 +117,14 @@ static HttpClient BuildClient()
     cookieContainer.Add(baseAddress, new Cookie("session", sessionCookie));
     var handler = new HttpClientHandler() { CookieContainer = cookieContainer };
     return new HttpClient(handler) { BaseAddress = baseAddress };
+}
+
+static void BuildFolderStructure(string path)
+{
+    var dir = Path.GetDirectoryName(path);
+    if (dir is not null && !Directory.Exists(dir))
+    {
+        Console.WriteLine($"creating directory {dir}");
+        Directory.CreateDirectory(dir);
+    }
 }
