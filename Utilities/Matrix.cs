@@ -94,6 +94,14 @@ public record Position(int X, int Y)
         yield return W;
         yield return NW;
     }
+
+    public static IEnumerable<Position> CardinalDirections()
+    {
+        yield return N;
+        yield return E;
+        yield return S;
+        yield return W;
+    }
 }
 
 public enum Direction
