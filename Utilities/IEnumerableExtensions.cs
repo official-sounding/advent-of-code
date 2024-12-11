@@ -30,4 +30,9 @@ public static class IEnumerableExtensions
             }
         }
     }
+
+    public static IEnumerable<(T value, int idx)> WithIndex<T>(this IEnumerable<T> elements)
+    {
+        return elements.Select((n, idx) => (n, idx));
+    }
 }
