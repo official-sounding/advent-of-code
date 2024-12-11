@@ -23,7 +23,7 @@ public class Day202407 : Problem
                    .Select(parts =>
                    {
                        var total = Convert.ToInt64(parts[0]);
-                       var nums = parts[1].Split(" ").Select((p) => Convert.ToInt64(p)).ToArray();
+                       var nums = parts[1].ToLongList().ToArray();
                        return (total, nums);
                    });
     }

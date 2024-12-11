@@ -16,8 +16,8 @@ public class Day202204 : Problem
     static ((int, int), (int, int)) Parse(string line)
     {
         var pairs = line.Split(",");
-        var firstAssign = pairs[0].Split("-").Select((s) => Convert.ToInt32(s)).ToList();
-        var secondAssign = pairs[1].Split("-").Select((s) => Convert.ToInt32(s)).ToList();
+        var firstAssign = pairs[0].ToIntList('-').ToList();
+        var secondAssign = pairs[1].ToIntList('-').ToList();
 
         return ((firstAssign[0], firstAssign[1]), (secondAssign[0], secondAssign[1]));
     }
