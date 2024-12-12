@@ -102,6 +102,8 @@ public record Position(int X, int Y)
         yield return S;
         yield return W;
     }
+
+    public override string ToString() => $"({X},{Y})";
 }
 
 public enum Direction
