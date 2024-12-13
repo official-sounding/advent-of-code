@@ -3,98 +3,72 @@ public class Day202212 : Problem
 {
     public override long RunPartOne(string[] input)
     {
-        int[,] heights = new int[input.Length, input[0].Length];
-        var vertexCount = input.Length * input[0].Length;
+        var matrix = Matrix.Parse(input);
+        var source = Position.Nil;
+        var target = Position.Nil;
 
-        (int, int) source = (0, 0);
-        (int, int) target = (0, 0);
-
-        HashSet<(int, int)> aValues = new();
-
-        foreach (var (line, row) in input.Select((l, idx) => (l, idx)))
+        foreach (var (pos, value) in matrix)
         {
-            foreach (var (ch, col) in line.Select((c, idx) => (c, idx)))
+            if (value == 'E')
             {
-                heights[row, col] = (int)ch;
-
-                if (ch == 'E')
-                {
-                    target = (row, col);
-                    heights[row, col] = (int)'z';
-                }
-                else if (ch == 'S')
-                {
-                    source = (row, col);
-                    heights[row, col] = (int)'a';
-                    aValues.Add((row, col));
-                }
-                else if (ch == 'a')
-                {
-                    aValues.Add((row, col));
-                }
+                matrix[pos] = 'z';
+                target = pos;
+            }
+            else if (value == 'S')
+            {
+                matrix[pos] = 'a';
+                source = pos;
             }
         }
 
-        var grid = new Grid(heights, input.Length, input[0].Length);
-
-        return FindShortedPath(grid, source, target);
+        return FindShortestPath(matrix, source, target);
     }
 
     public override long RunPartTwo(string[] input)
     {
-        int[,] heights = new int[input.Length, input[0].Length];
-        var vertexCount = input.Length * input[0].Length;
+        var matrix = Matrix.Parse(input);
+        var target = Position.Nil;
+        HashSet<Position> starts = [];
 
-        (int, int) target = (0, 0);
-
-        HashSet<(int, int)> aValues = new();
-
-        foreach (var (line, row) in input.Select((l, idx) => (l, idx)))
+        foreach (var (pos, value) in matrix)
         {
-            foreach (var (ch, col) in line.Select((c, idx) => (c, idx)))
+            if (value == 'E')
             {
-                heights[row, col] = (int)ch;
-
-                if (ch == 'E')
-                {
-                    target = (row, col);
-                    heights[row, col] = (int)'z';
-                }
-                else if (ch == 'S')
-                {
-                    heights[row, col] = (int)'a';
-                    aValues.Add((row, col));
-                }
-                else if (ch == 'a')
-                {
-                    aValues.Add((row, col));
-                }
+                matrix[pos] = 'z';
+                target = pos;
+            }
+            else if (value == 'S')
+            {
+                matrix[pos] = 'a';
+                starts.Add(pos);
+            }
+            else if (value == 'a')
+            {
+                starts.Add(pos);
             }
         }
 
-        var grid = new Grid(heights, input.Length, input[0].Length);
-        return aValues.Select(src => FindShortedPath(grid, src, target)).Min();
+        return starts.Select(src => FindShortestPath(matrix, src, target)).Min();
     }
 
-    static int FindShortedPath(Grid grid, (int, int) source, (int, int) target)
+    static int FindShortestPath(Matrix matrix, Position source, Position target)
     {
-        Dictionary<(int, int), int> distances = new();
-        Dictionary<(int, int), (int, int)> previous = new();
-        PriorityQueue<(int, int), int> Q = new();
+        Dictionary<Position, int> distances = [];
+        Dictionary<Position, Position> prevs = [];
+        PriorityQueue<Position, int> Q = new();
 
         distances[source] = 0;
-
         Q.Enqueue(source, 0);
 
-        while (Q.TryDequeue(out var u, out var _) && u != target)
+        while (Q.TryDequeue(out var u, out _) && u != target)
         {
-            foreach (var v in grid.Neighbours(u))
+            foreach (var v in Neighbors(matrix, u))
             {
                 var alt = distances[u] + 1;
                 if (alt < distances.GetValueOrDefault(v, int.MaxValue))
                 {
                     distances[v] = alt;
-                    previous[v] = u;
+                    prevs[v] = u;
                     if (!Q.UnorderedItems.Any((x) => x.Element == v))
                     {
                         Q.Enqueue(v, alt);
@@ -113,40 +87,20 @@ public class Day202212 : Problem
         }
     }
 
-
-    static IEnumerable<(int, int)> Path((int, int) target, Dictionary<(int, int), (int, int)> prev)
+    static IEnumerable<Position> Neighbors(Matrix matrix, Position u)
     {
-        var node = target;
-        while (prev.TryGetValue(node, out node))
+        if (!matrix.TryGetValue(u, out var cellHeight))
         {
-            yield return node;
+            yield break;
         }
-    }
-}
 
-record Grid(int[,] heights, int height, int width)
-{
-    bool ValidCell((int x, int y) cell) => cell.x >= 0 && cell.y >= 0 && cell.x < height && cell.y < width;
-
-    public IEnumerable<(int, int)> Neighbours((int, int) u)
-    {
-        var (row, col) = u;
-        var cellHeight = heights[row, col];
-        foreach (var (x, y) in Offsets())
+        foreach (var dir in Position.CardinalDirections())
         {
-            var newCell = (row + x, col + y);
-            if (ValidCell(newCell) && heights[newCell.Item1, newCell.Item2] <= cellHeight + 1)
+            var newCell = u + dir;
+            if (matrix.TryGetValue(newCell, out var nextHeight) && nextHeight <= cellHeight + 1)
             {
                 yield return newCell;
             }
         }
-    }
-
-    private static IEnumerable<(int x, int y)> Offsets()
-    {
-        yield return (0, -1);
-        yield return (0, 1);
-        yield return (1, 0);
-        yield return (-1, 0);
     }
 }
