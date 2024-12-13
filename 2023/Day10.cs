@@ -1,8 +1,6 @@
 using System.Collections;
 
 [Slug("2023/d10")]
-
-
 public class Day202310 : Problem
 {
     public override long RunPartOne(string[] input)
@@ -36,7 +34,7 @@ public class Day202310 : Problem
 
         while (value != 'S')
         {
-            pos += dir.ToOffset();
+            pos += dir;
             steps.Add(pos);
             value = matrix[pos];
             dir = CheckDirectionChange(value, dir);
@@ -61,31 +59,31 @@ public class Day202310 : Problem
         return Math.Abs(area) / 2;
     }
 
-    static Direction CheckDirectionChange(char value, Direction dir)
+    static Position CheckDirectionChange(char value, Position dir)
     {
         return value switch
         {
-            'F' => dir == Direction.N ? Direction.E : Direction.S,
-            '7' => dir == Direction.N ? Direction.W : Direction.S,
-            'L' => dir == Direction.S ? Direction.E : Direction.N,
-            'J' => dir == Direction.S ? Direction.W : Direction.N,
+            'F' => dir == Position.N ? Position.E : Position.S,
+            '7' => dir == Position.N ? Position.W : Position.S,
+            'L' => dir == Position.S ? Position.E : Position.N,
+            'J' => dir == Position.S ? Position.W : Position.N,
             _ => dir
         };
     }
 
-    static Direction FindInitialDirection(Matrix matrix, Position start)
+    static Position FindInitialDirection(Matrix matrix, Position start)
     {
-        List<(Direction, string)> dirs = [
-            (Direction.N, "F|7"),
-            (Direction.S, "L|J"),
-            (Direction.W, "F-L"),
-            (Direction.E, "7-J")
+        List<(Position, string)> dirs = [
+            (Position.N, "F|7"),
+            (Position.S, "L|J"),
+            (Position.W, "F-L"),
+            (Position.E, "7-J")
         ];
 
         return dirs.First((o) =>
         {
             var (dir, valid) = o;
-            return matrix.TryGetValue(start + dir.ToOffset(), out var candidate) && valid.Contains(candidate);
+            return matrix.TryGetValue(start + dir, out var candidate) && valid.Contains(candidate);
         }).Item1;
     }
 }

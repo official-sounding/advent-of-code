@@ -72,7 +72,34 @@ public record Position(int X, int Y)
     public static Position SW => new(-1, -1);
     public static Position NW => new(-1, 1);
 
+    public bool UnitVector => (Math.Abs(X) == 1 && Y == 0) || (X == 0 && Math.Abs(Y) == 1);
+
     public Position Scale(int factor) => this with { X = X * factor, Y = Y * factor };
+
+    public Position RotateLeft(int quadrant = 1)
+    {
+        if (!UnitVector)
+        {
+            throw new Exception("Cannot Rotate non-unit vector");
+        }
+
+        var dirs = CardinalDirections().ToArray();
+        var start = Array.IndexOf(dirs, this);
+
+        return dirs[(start + quadrant) % 4];
+    }
+
+    public Position RotateRight(int quadrant = 1)
+    {
+        if (!UnitVector)
+        {
+            throw new Exception("Cannot Rotate non-unit vector");
+        }
+        var dirs = CardinalDirections().ToArray();
+        var start = Array.IndexOf(dirs, this);
+
+        return dirs[(start - quadrant + 4) % 4];
+    }
 
     public (int, int) Tuple => (X, Y);
 
@@ -104,55 +131,4 @@ public record Position(int X, int Y)
     }
 
     public override string ToString() => $"({X},{Y})";
-}
-
-public enum Direction
-{
-    N = 0,
-    NE = 1,
-    E = 2,
-    SE = 3,
-    S = 4,
-    SW = 5,
-    W = 6,
-    NW = 7
-}
-
-public static class DirectionExtensions
-{
-    public static Direction RotateLeft90(this Direction dir)
-    {
-        return (Direction)(((int)dir + 2) % 8);
-    }
-
-    public static Direction RotateRight90(this Direction dir)
-    {
-        return (Direction)(((int)dir + 8 - 2) % 8);
-    }
-
-    public static Direction RotateLeft45(this Direction dir)
-    {
-        return (Direction)(((int)dir + 1) % 8);
-    }
-
-    public static Direction RotateRight45(this Direction dir)
-    {
-        return (Direction)(((int)dir + 8 - 1) % 8);
-    }
-
-    public static Position ToOffset(this Direction dir)
-    {
-        return dir switch
-        {
-            Direction.N => Position.N,
-            Direction.NE => Position.NE,
-            Direction.E => Position.E,
-            Direction.SE => Position.SE,
-            Direction.S => Position.S,
-            Direction.SW => Position.SW,
-            Direction.W => Position.W,
-            Direction.NW => Position.NW,
-            _ => throw new Exception($"{dir} invalid")
-        };
-    }
 }

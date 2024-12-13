@@ -109,9 +109,9 @@ public class Day202412 : Problem
 
     bool ScanSide(Matrix matrix, char value, Position dir, HashSet<Position> region, Position node)
     {
-        if (!region.Remove(node)) 
-        { 
-            return false; 
+        if (!region.Remove(node))
+        {
+            return false;
         }
 
         // return false if not on the edge defined by `dir`
@@ -121,17 +121,8 @@ public class Day202412 : Problem
         }
 
 
-        // if we are on that edge, scan in either direction to remove all other elements of that edge
-        if (dir == Position.N || dir == Position.S)
-        {
-            ScanSide(matrix, value, dir, region, node + Position.W);
-            ScanSide(matrix, value, dir, region, node + Position.E);
-        }
-        else
-        {
-            ScanSide(matrix, value, dir, region, node + Position.N);
-            ScanSide(matrix, value, dir, region, node + Position.S);
-        }
+        ScanSide(matrix, value, dir, region, node + dir.RotateLeft());
+        ScanSide(matrix, value, dir, region, node + dir.RotateRight());
 
         return true;
     }
