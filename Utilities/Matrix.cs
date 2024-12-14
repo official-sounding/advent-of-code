@@ -62,23 +62,14 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
 
 public record Position(int X, int Y)
 {
-    public static Position Nil => new(0, 0);
-    public static Position N => new(0, 1);
-    public static Position S => new(0, -1);
-    public static Position E => new(1, 0);
-    public static Position W => new(-1, 0);
-    public static Position NE => new(1, 1);
-    public static Position SE => new(1, -1);
-    public static Position SW => new(-1, -1);
-    public static Position NW => new(-1, 1);
-
-    public bool UnitVector => (Math.Abs(X) == 1 && Y == 0) || (X == 0 && Math.Abs(Y) == 1);
+    public bool IsUnitVector => (Math.Abs(X) == 1 && Y == 0) || (X == 0 && Math.Abs(Y) == 1);
+    public (int, int) Tuple => (X, Y);
 
     public Position Scale(int factor) => this with { X = X * factor, Y = Y * factor };
 
     public Position RotateLeft(int quadrant = 1)
     {
-        if (!UnitVector)
+        if (!IsUnitVector)
         {
             throw new Exception("Cannot Rotate non-unit vector");
         }
@@ -91,7 +82,7 @@ public record Position(int X, int Y)
 
     public Position RotateRight(int quadrant = 1)
     {
-        if (!UnitVector)
+        if (!IsUnitVector)
         {
             throw new Exception("Cannot Rotate non-unit vector");
         }
@@ -101,7 +92,7 @@ public record Position(int X, int Y)
         return dirs[(start - quadrant + 4) % 4];
     }
 
-    public (int, int) Tuple => (X, Y);
+    public override string ToString() => $"({X},{Y})";
 
     public static Position operator -(Position me, Position other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Position operator +(Position me, Position other) => new(Y: me.Y + other.Y, X: me.X + other.X);
@@ -109,6 +100,15 @@ public record Position(int X, int Y)
     public static implicit operator Position((int, int) b) => FromTuple(b);
 
     public static Position FromTuple((int, int) b) => new(b.Item1, b.Item2);
+    public static Position FromString(string str, string separator = ",")
+    {
+        if (str.Split(separator) is [var xStr, var yStr] && int.TryParse(xStr, out var x) && int.TryParse(yStr, out var y))
+        {
+            return new(x, y);
+        }
+
+        throw new ArgumentException(str);
+    }
 
     public static IEnumerable<Position> AllDirections()
     {
@@ -130,5 +130,14 @@ public record Position(int X, int Y)
         yield return W;
     }
 
-    public override string ToString() => $"({X},{Y})";
+    public static Position Nil => new(0, 0);
+    public static Position N => new(0, 1);
+    public static Position S => new(0, -1);
+    public static Position E => new(1, 0);
+    public static Position W => new(-1, 0);
+    public static Position NE => new(1, 1);
+    public static Position SE => new(1, -1);
+    public static Position SW => new(-1, -1);
+    public static Position NW => new(-1, 1);
+
 }
