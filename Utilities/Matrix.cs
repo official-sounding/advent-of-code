@@ -5,22 +5,28 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
     private Dictionary<Position, char> _matrix = [];
 
     // from input, generates a matrix where (0,0) is the bottom left
-    public static Matrix Parse(string[] input)
+    public static Matrix Parse(IEnumerable<string> input)
     {
-        var result = new Matrix
-        {
-            _matrix = input
+        var maxX = int.MinValue;
+        var maxY = int.MinValue;
+        var dict = input
                 .Reverse()
                 .SelectMany((l, y) => l.ToCharArray().Select((n, x) => (x, y, n)))
                 .ToDictionary((t) =>
                     {
                         var (x, y, _) = t;
+                        maxX = Math.Max(maxX, x);
+                        maxY = Math.Max(maxY, y);
                         return new Position(x, y);
                     }, (t) => t.n
-                )
-        };
+                );
 
-        return result;
+        return new Matrix
+        {
+            _matrix = dict,
+            MaxX = maxX,
+            MaxY = maxY
+        };
     }
 
     public char this[Position i]
@@ -28,6 +34,9 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
         get => _matrix[i];
         set => _matrix[i] = value;
     }
+
+    public int MaxX { get; init; }
+    public int MaxY { get; init; }
 
     public bool TryGetValue(Position position, out char value)
     {
@@ -57,6 +66,25 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return _matrix.GetEnumerator();
+    }
+
+    public void WriteToConsole()
+    {
+        var grid = _matrix
+            .GroupBy((kv) => kv.Key.Y)
+            .OrderByDescending(grp => grp.Key)
+            .Select(grp => grp.OrderBy(k => k.Key.X).Select(kv => kv.Value).ToArray())
+            .ToArray();
+
+
+        foreach (var row in grid)
+        {
+            foreach (var col in row)
+            {
+                Console.Write(col);
+            }
+            Console.WriteLine();
+        }
     }
 }
 
