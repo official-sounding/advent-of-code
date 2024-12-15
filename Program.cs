@@ -52,6 +52,7 @@ if (File.Exists(exampleFile))
     var exampleInput = await File.ReadAllLinesAsync(exampleFile);
     if (Activator.CreateInstance(type) is AsyncProblem example)
     {
+        example.ExampleMode = true;
         var part1 = await example.RunPartOneAsync(exampleInput);
         Console.WriteLine($"Part 1: {part1}");
         var part2 = await example.RunPartTwoAsync(exampleInput);

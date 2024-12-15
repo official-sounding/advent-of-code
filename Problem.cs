@@ -1,5 +1,6 @@
 public abstract class AsyncProblem
 {
+    public bool ExampleMode { get; set; }
     public abstract Task<string> RunPartOneAsync(string[] input);
     public virtual Task<string> RunPartTwoAsync(string[] input)
     {
