@@ -5,28 +5,48 @@ public class Day202417 : AsyncProblem
     {
         var computer = new Computer()
         {
-            A = Convert.ToInt32(input[0].Replace("Register A: ", "")),
-            B = Convert.ToInt32(input[1].Replace("Register B: ", "")),
-            C = Convert.ToInt32(input[2].Replace("Register C: ", "")),
-            Program = input[4].Replace("Program: ","").Split(',').SelectMany(s => s.ToCharArray()).ToArray(),
+            Program = input[4].Replace("Program: ", "").Split(',').SelectMany(s => s.ToCharArray()).ToArray(),
             ExampleMode = ExampleMode
         };
 
-        return Task.FromResult(computer.RunProgram());
+        return Task.FromResult(computer.RunProgram(Convert.ToInt32(input[0].Replace("Register A: ", ""))));
+    }
+
+    public override Task<string> RunPartTwoAsync(string[] input)
+    {
+        var programStr = input[4].Replace("Program: ", "");
+        var program = programStr.Split(',').SelectMany(s => s.ToCharArray()).ToArray();
+        var output = string.Empty;
+        var computer = new Computer()
+        {
+            Program = program,
+            ExampleMode = ExampleMode
+        };
+        long a = 0;
+        for (int i = 0; i < programStr.Length; i++)
+        {
+            Console.WriteLine(i);
+            for (a <<= 3; ; ++a)
+            {
+                if (computer.RunProgram(a)[..(i + 1)].SequenceEqual(program[^(i + 1)..]))
+                    break;
+            }
+        }
+        return Task.FromResult($"{a}");
     }
 }
 
 public class Computer
 {
-    public int A { get; set; }
-    public int B { get; set; }
-    public int C { get; set; }
+    public long A { get; set; }
+    public long B { get; set; }
+    public long C { get; set; }
     public required char[] Program { get; set; }
     public bool ExampleMode { get; set; }
     private List<int> _outputs = [];
     private int _ip = 0;
 
-    private int ComboOperand(char o) => o switch
+    private long ComboOperand(char o) => o switch
     {
         '0' => 0,
         '1' => 1,
@@ -38,10 +58,29 @@ public class Computer
         _ => throw new Exception($"{o} is invalid combo operand")
     };
 
-    private int LiteralOperand(char o) => Convert.ToInt32($"{o}");
-
-    public string RunProgram()
+    private int LiteralOperand(char o) => o switch
     {
+        '0' => 0,
+        '1' => 1,
+        '2' => 2,
+        '3' => 3,
+        '4' => 4,
+        '5' => 5,
+        '6' => 6,
+        '7' => 7,
+        _ => throw new Exception("!!")
+    };
+    private void Reset(long a)
+    {
+        A = a;
+        B = 0;
+        C = 0;
+        _ip = 0;
+        _outputs =[];
+    }
+    public string RunProgram(long a)
+    {
+        Reset(a);
         while (_ip < Program.Length - 1)
         {
             var op = Program[_ip++];
@@ -53,10 +92,9 @@ public class Computer
                     { //adv
                         OutputInstruction("adv", ComboOperand(operand));
                         var numerator = A;
-                        var denominator = (long)Math.Pow(2, ComboOperand(operand));
+                        var denominator = 1 << (int)ComboOperand(operand);
 
-                        var result = numerator / denominator;
-                        A = unchecked((int)(uint)(result & uint.MaxValue));
+                        A = numerator / denominator;
                         break;
                     }
                 case '1':
@@ -92,27 +130,23 @@ public class Computer
                     {
                         OutputInstruction("out", ComboOperand(operand));
 
-                        _outputs.Add(ComboOperand(operand) % 8);
+                        _outputs.Add((int)ComboOperand(operand) % 8);
                         break;
                     }
                 case '6':
                     {
                         OutputInstruction("bdv", ComboOperand(operand));
                         var numerator = A;
-                        var denominator = (long)Math.Pow(2, ComboOperand(operand));
-
-                        var result = numerator / denominator;
-                        B = unchecked((int)(uint)(result & uint.MaxValue));
+                        var denominator = 1L << (int)ComboOperand(operand);
+                        B = numerator / denominator;
                         break;
                     }
                 case '7':
                     {
                         OutputInstruction("cdv", ComboOperand(operand));
                         var numerator = A;
-                        var denominator = (long)Math.Pow(2, ComboOperand(operand));
-
-                        var result = numerator / denominator;
-                        C = unchecked((int)(uint)(result & uint.MaxValue));
+                        var denominator = 1L << (int)ComboOperand(operand);
+                        C = numerator / denominator;
                         break;
                     }
             }
@@ -120,11 +154,11 @@ public class Computer
         return string.Join(',', _outputs);
     }
 
-    void OutputInstruction(string inst, int op)
+    void OutputInstruction(string inst, long op)
     {
         if (ExampleMode)
         {
-            Console.WriteLine($"{inst} {op,10}");
+            Console.WriteLine($"{inst} {op,20}");
         }
     }
 }
