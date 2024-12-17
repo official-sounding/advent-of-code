@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-[Slug("2023/d01")]
+[Slug(2023, 01)]
 public class Day01 : Problem
 {
     private Dictionary<string, string> spelledOut = new Dictionary<string, string>{

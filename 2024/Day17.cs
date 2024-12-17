@@ -1,4 +1,4 @@
-[Slug("2024/d17")]
+[Slug(2024, 17)]
 public class Day202417 : AsyncProblem
 {
     public override Task<string> RunPartOneAsync(string[] input)

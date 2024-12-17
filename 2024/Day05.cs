@@ -45,7 +45,7 @@ public class UpdateComparer(Dictionary<int, PrintRules> rules) : Comparer<int>
     }
 }
 
-[Slug("2024/d05")]
+[Slug(2024, 05)]
 public class Day202405 : Problem
 {
     public override long RunPartOne(string[] input)

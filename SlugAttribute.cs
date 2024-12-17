@@ -1,7 +1,8 @@
 [System.AttributeUsage(AttributeTargets.Class |
                        AttributeTargets.Struct)
 ]
-public class SlugAttribute(string name) : Attribute
+public class SlugAttribute(int year, int day) : Attribute
 {
-    public string Name = name;
+    public int Year = year;
+    public int Day = day;
 }

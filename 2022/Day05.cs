@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-[Slug("2022/d05")]
+[Slug(2022, 05)]
 public class Day202205 : AsyncProblem
 {
     public override Task<string> RunPartOneAsync(string[] input)

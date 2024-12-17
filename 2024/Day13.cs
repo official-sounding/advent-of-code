@@ -1,6 +1,6 @@
 using System.Security.Cryptography.X509Certificates;
 
-[Slug("2024/d13")]
+[Slug(2024, 13)]
 public class Day202413 : Problem
 {
     public override long RunPartOne(string[] input)

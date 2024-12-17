@@ -1,4 +1,4 @@
-[Slug("2023/d07")]
+[Slug(2023, 07)]
 public class Day202307 : Problem
 {
     private char[] cardOrder = ['2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'];

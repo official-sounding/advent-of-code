@@ -1,6 +1,6 @@
 using System.Text;
 
-[Slug("2024/d09")]
+[Slug(2024, 09)]
 public class Day202409 : Problem
 {
     private readonly Block free = new Block(0, true);

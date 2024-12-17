@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-[Slug("2020/d04")]
+[Slug(2020, 04)]
 public class Day202004 : Problem
 {
     public override long RunPartOne(string[] input)

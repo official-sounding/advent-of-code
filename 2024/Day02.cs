@@ -1,4 +1,4 @@
-[Slug("2024/d02")]
+[Slug(2024, 02)]
 public class Day202402 : Problem
 {
     private IEnumerable<List<int>> ExtractNumbers(string[] input) => input

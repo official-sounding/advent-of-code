@@ -2,23 +2,26 @@
 using System.Diagnostics;
 using System.Net;
 
-if (args.Length != 1)
+if (args.Length != 2)
 {
-    Console.Error.WriteLine("must supply exactly one param, slug of problem to run");
+    Console.Error.WriteLine("must supply exactly two params, [year] [day]");
     Environment.Exit(1);
 }
 
-Dictionary<string, Type> types = AppDomain.CurrentDomain.GetAssemblies()
+Dictionary<(int,int), Type> types = AppDomain.CurrentDomain.GetAssemblies()
 .SelectMany(s => s.GetTypes())
 .Where(p => typeof(AsyncProblem).IsAssignableFrom(p) && p != typeof(AsyncProblem))
 .Select(t => (slug: GetSlug(t), type: t))
 .Where(tuple => tuple.slug != null)
-.ToDictionary(t => t.slug ?? "", t => t.type);
+.ToDictionary(t => ((int,int))t.slug!, t => t.type);
 
 
 Console.WriteLine($"Enumerated {types.Count} implementations");
 
-var slug = args[0];
+var year = Convert.ToInt32(args[0]);
+var day = Convert.ToInt32(args[1]);
+var slug = (year,day);
+var path = SlugToPath(slug);
 Console.WriteLine($"Finding impl for {slug}");
 
 if (!types.TryGetValue(slug, out var type))
@@ -27,16 +30,13 @@ if (!types.TryGetValue(slug, out var type))
     Environment.Exit(2);
 }
 
-var inputFile = Path.Combine("input", $"{SlugToPath(slug)}.txt");
-var exampleFile = Path.Combine("examples", $"{SlugToPath(slug)}.txt");
+var inputFile = Path.Combine("input", $"{path}.txt");
+var exampleFile = Path.Combine("examples", $"{path}.txt");
 if (!File.Exists(inputFile))
 {
     Console.WriteLine($"for {slug}, {inputFile} does not exist, pulling");
     BuildFolderStructure(inputFile);
     using var client = BuildClient();
-    var parts = slug.Split('/');
-    var year = parts[0];
-    var day = Convert.ToInt32(parts[1][1..]);
     var url = $"/{year}/day/{day}/input";
     Console.WriteLine($"Downloading from {url}");
     var res = await client.GetAsync(url);
@@ -86,27 +86,18 @@ else
 
 
 
-static string? GetSlug(Type t)
+static (int,int)? GetSlug(Type t)
 {
     // Get instance of the attribute.
     var attr = Attribute.GetCustomAttribute(t, typeof(SlugAttribute)) as SlugAttribute;
-
-    // if (attr == null)
-    // {
-    //     throw new Exception($"No Slug Attribute defined on {t.FullName}");
-    // }
-    // else if (string.IsNullOrEmpty(attr.Name))
-    // {
-    //     throw new Exception($"Invalid slug defined on {t.FullName}");
-    // }
-
-    return attr?.Name;
+    return attr == null ? null : (attr.Year, attr.Day);
 }
 
 
-static string SlugToPath(string slug)
+static string SlugToPath((int,int) slug)
 {
-    return slug.Replace('/', Path.DirectorySeparatorChar);
+    var (year,day) = slug;
+    return Path.Combine($"{year}",$"{day}");
 }
 
 

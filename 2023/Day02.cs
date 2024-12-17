@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-[Slug("2023/d02")]
+[Slug(2023, 02)]
 public class Day02 : Problem
 {
 

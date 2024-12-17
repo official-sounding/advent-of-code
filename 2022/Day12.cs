@@ -1,4 +1,4 @@
-[Slug("2022/d12")]
+[Slug(2022, 12)]
 public class Day202212 : Problem
 {
     public override long RunPartOne(string[] input)

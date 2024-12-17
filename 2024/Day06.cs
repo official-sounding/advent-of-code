@@ -45,7 +45,7 @@ public record GuardState(int X, int Y, GuardOrientation Orientation)
     }
 }
 
-[Slug("2024/d06")]
+[Slug(2024, 06)]
 public class Day202406 : Problem
 {
     private Dictionary<char, GuardOrientation> GuardOrientationMap = new() { { '^', GuardOrientation.Up }, { 'v', GuardOrientation.Down }, { '<', GuardOrientation.Left }, { '>', GuardOrientation.Right } };

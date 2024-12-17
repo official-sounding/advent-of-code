@@ -1,4 +1,4 @@
-[Slug("2024/d11")]
+[Slug(2024, 11)]
 public class Day202411 : Problem
 {
 

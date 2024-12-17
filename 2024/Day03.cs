@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-[Slug("2024/d03")]
+[Slug(2024, 03)]
 public class Day202403 : Problem
 {
     private static readonly Regex mulMatcher = new(@"mul\((\d{1,3}),(\d{1,3})\)");

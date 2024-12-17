@@ -1,6 +1,6 @@
 using System.Collections;
 
-[Slug("2023/d10")]
+[Slug(2023, 10)]
 public class Day202310 : Problem
 {
     public override long RunPartOne(string[] input)

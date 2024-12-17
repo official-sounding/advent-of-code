@@ -1,4 +1,4 @@
-[Slug("2024/d04")]
+[Slug(2024, 04)]
 public class Day202404 : Problem
 {
     private int SearchXMAS(Matrix matrix, Position start)

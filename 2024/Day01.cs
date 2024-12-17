@@ -1,4 +1,4 @@
-[Slug("2024/d01")]
+[Slug(2024, 01)]
 public class Day202401 : Problem
 {
     private (List<int>, List<int>) ExtractNumbers(string[] input) => input
