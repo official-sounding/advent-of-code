@@ -167,5 +167,4 @@ public record Position(int X, int Y)
     public static Position SE => new(1, -1);
     public static Position SW => new(-1, -1);
     public static Position NW => new(-1, 1);
-
 }
