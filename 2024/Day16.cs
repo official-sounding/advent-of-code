@@ -6,60 +6,82 @@ public class Day202416 : Problem
         var matrix = Matrix.Parse(input);
         var pos = matrix.FindPosition('S');
         var end = matrix.FindPosition('E');
-
-        return FindShortestPath(matrix, new(pos, Position.E), end);
+        var (part1, _) = FindShortestPath(matrix, new(pos, Position.E, [pos]), end);
+        return part1;
     }
 
     public override long RunPartTwo(string[] input)
     {
-        return base.RunPartTwo(input);
+        var matrix = Matrix.Parse(input);
+        var pos = matrix.FindPosition('S');
+        var end = matrix.FindPosition('E');
+        var (_, part2) = FindShortestPath(matrix, new(pos, Position.E, [pos]), end);
+
+        return part2;
     }
 
-    static int FindShortestPath(Matrix matrix, MazeState source, Position target)
+    static (int, int) FindShortestPath(Matrix matrix, MazeState source, Position target)
     {
-        Dictionary<MazeState, int> distances = [];
+        Dictionary<(Position pos, Position dir), int> distances = [];
         PriorityQueue<MazeState, int> Q = new();
-
-        distances[source] = 0;
+        distances[source.state] = 0;
         Q.Enqueue(source, 0);
 
-        while (Q.TryDequeue(out var u, out _))
+
+        HashSet<Position> allPaths = [];
+        var shortestPathLength = 0;
+
+        while (Q.TryDequeue(out var u, out var qCost))
         {
             if (u.pos == target)
             {
-                return distances[u];
+                if (shortestPathLength == 0)
+                {
+                    shortestPathLength = qCost;
+                }
+
+                if (qCost > shortestPathLength)
+                {
+                    break;
+                }
+
+
+                allPaths.UnionWith(u.paths);
             }
 
-            foreach (var (v, cost) in Neighbors(matrix, u))
+            if (distances.GetValueOrDefault(u.state, int.MaxValue) < qCost)
             {
-                var alt = distances[u] + cost;
-                if (alt < distances.GetValueOrDefault(v, int.MaxValue))
-                {
-                    distances[v] = alt;
-                    if (!Q.UnorderedItems.Any((x) => x.Element == v))
-                    {
-                        Q.Enqueue(v, alt);
-                    }
-                }
+                continue;
+            }
+
+            distances[u.state] = qCost;
+
+            foreach (var (v, incCost) in Neighbors(matrix, u))
+            {
+                var alt = qCost + incCost;
+                Q.Enqueue(v, alt);
             }
         }
 
-        return int.MaxValue;
+        return (shortestPathLength, allPaths.Count);
     }
 
     static IEnumerable<(MazeState p, int cost)> Neighbors(Matrix matrix, MazeState u)
     {
-        var (pos, dir) = u;
+        var (pos, dir, paths) = u;
         var possibles = new[] { (dir, 1), (dir.RotateLeft(), 1001), (dir.RotateRight(), 1001) };
 
         foreach (var (d, cost) in possibles)
         {
             if (matrix.TryGetValue(pos + d, out var c) && c != '#')
             {
-                yield return (new(pos + d, d), cost);
+                yield return (new(pos + d, d, [.. paths, pos + d]), cost);
             }
         }
     }
 }
 
-public record MazeState(Position pos, Position dir);
+public record MazeState(Position pos, Position dir, HashSet<Position> paths)
+{
+    public (Position, Position) state => (pos, dir);
+}
