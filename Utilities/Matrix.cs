@@ -29,6 +29,21 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
         };
     }
 
+    public static Matrix FromDimensions(int maxX, int maxY, char c = '.') {
+        var dict = new Dictionary<Position, char>();
+        for (var x = 0; x <= maxX; x++) {
+            for(var y = 0; y <= maxY; y++) {
+                dict[(x,y)] = c;
+            }
+        }
+
+        return new Matrix {
+            _matrix = dict,
+            MaxX = maxX,
+            MaxY = maxY
+        };
+    }
+
     public char this[Position i]
     {
         get => _matrix[i];
