@@ -29,15 +29,19 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
         };
     }
 
-    public static Matrix FromDimensions(int maxX, int maxY, char c = '.') {
+    public static Matrix FromDimensions(int maxX, int maxY, char c = '.')
+    {
         var dict = new Dictionary<Position, char>();
-        for (var x = 0; x <= maxX; x++) {
-            for(var y = 0; y <= maxY; y++) {
-                dict[(x,y)] = c;
+        for (var x = 0; x <= maxX; x++)
+        {
+            for (var y = 0; y <= maxY; y++)
+            {
+                dict[(x, y)] = c;
             }
         }
 
-        return new Matrix {
+        return new Matrix
+        {
             _matrix = dict,
             MaxX = maxX,
             MaxY = maxY
@@ -134,6 +138,8 @@ public record Position(int X, int Y)
 
         return dirs[(start - quadrant + 4) % 4];
     }
+
+    public int ManhattanDistance(Position b) => Math.Abs(X - b.X) + Math.Abs(Y - b.Y);
 
     public override string ToString() => $"({X},{Y})";
 
