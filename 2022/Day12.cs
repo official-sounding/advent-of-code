@@ -21,7 +21,7 @@ public class Day202212 : Problem
             }
         }
 
-        return FindShortestPath(matrix, source, target);
+        return Dijkstra.FindPathLength(matrix, source, target, Neighbors);
     }
 
     public override long RunPartTwo(string[] input)
@@ -48,46 +48,10 @@ public class Day202212 : Problem
             }
         }
 
-        return starts.Select(src => FindShortestPath(matrix, src, target)).Min();
+        return starts.Select(src => Dijkstra.FindPathLength(matrix, src, target, Neighbors)).Min();
     }
 
-    static int FindShortestPath(Matrix matrix, Position source, Position target)
-    {
-        Dictionary<Position, int> distances = [];
-        Dictionary<Position, Position> prevs = [];
-        PriorityQueue<Position, int> Q = new();
-
-        distances[source] = 0;
-        Q.Enqueue(source, 0);
-
-        while (Q.TryDequeue(out var u, out _) && u != target)
-        {
-            foreach (var v in Neighbors(matrix, u))
-            {
-                var alt = distances[u] + 1;
-                if (alt < distances.GetValueOrDefault(v, int.MaxValue))
-                {
-                    distances[v] = alt;
-                    prevs[v] = u;
-                    if (!Q.UnorderedItems.Any((x) => x.Element == v))
-                    {
-                        Q.Enqueue(v, alt);
-                    }
-                }
-            }
-        }
-
-        if (distances.TryGetValue(target, out var result))
-        {
-            return result;
-        }
-        else
-        {
-            return int.MaxValue;
-        }
-    }
-
-    static IEnumerable<Position> Neighbors(Matrix matrix, Position u)
+    static IEnumerable<(Position,int)> Neighbors(Matrix matrix, Position u)
     {
         if (!matrix.TryGetValue(u, out var cellHeight))
         {
@@ -99,7 +63,7 @@ public class Day202212 : Problem
             var newCell = u + dir;
             if (matrix.TryGetValue(newCell, out var nextHeight) && nextHeight <= cellHeight + 1)
             {
-                yield return newCell;
+                yield return (newCell,1);
             }
         }
     }

@@ -8,7 +8,7 @@ public class Day202418 : Problem
             matrix[block] = '#';
         }
 
-        return FindShortestPath(matrix, (0,0), (70,70));
+        return Dijkstra.FindPathLength(matrix, (0,0), (70,70));
     }
 
     public override Task<string> RunPartTwoAsync(string[] input)
@@ -22,7 +22,7 @@ public class Day202418 : Problem
         for(var i = 1024; ;i++) {
             blocker = Position.FromString(input[i]);
             matrix[blocker] = '#';
-            var dist = FindShortestPath(matrix, (0,0), (70,70));
+            var dist = Dijkstra.FindPathLength(matrix, (0,0), (70,70));
             if(dist == int.MaxValue) {
                 break;
             }
