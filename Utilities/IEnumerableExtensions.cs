@@ -35,4 +35,19 @@ public static class IEnumerableExtensions
     {
         return elements.Select((n, idx) => (n, idx));
     }
+
+    public static IEnumerable<TRes> Pairwise<T, TRes>(this IEnumerable<T> items, Func<T, T, TRes> selector)
+    {
+        using var it = items.GetEnumerator();
+        if (!it.MoveNext())
+            yield break;
+        T last = it.Current;
+
+        while (it.MoveNext())
+        {
+            T cur = it.Current;
+            yield return selector(last, cur);
+            last = cur;
+        }
+    }
 }

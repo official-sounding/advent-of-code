@@ -63,6 +63,7 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
     }
 
     public bool ValidPosition(Position position) => _matrix.ContainsKey(position);
+    public bool Remove(Position position) => _matrix.Remove(position);
 
     public Position FindPosition(char x)
     {
@@ -145,6 +146,7 @@ public record Position(int X, int Y)
 
     public static Position operator -(Position me, Position other) => new(Y: me.Y - other.Y, X: me.X - other.X);
     public static Position operator +(Position me, Position other) => new(Y: me.Y + other.Y, X: me.X + other.X);
+    public static Position operator *(Position me, int magnitude) => me.Scale(magnitude);
 
     public static implicit operator Position((int, int) b) => FromTuple(b);
 
@@ -157,6 +159,18 @@ public record Position(int X, int Y)
         }
 
         throw new ArgumentException(str);
+    }
+
+    public static Position FromArrow(char c)
+    {
+        return c switch
+        {
+            '^' => N,
+            '>' => E,
+            'v' => S,
+            '<' => W,
+            _ => throw new Exception($"{c}!!")
+        };
     }
 
     public static IEnumerable<Position> AllDirections()
