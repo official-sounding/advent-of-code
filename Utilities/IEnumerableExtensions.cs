@@ -31,6 +31,27 @@ public static class IEnumerableExtensions
         }
     }
 
+    public static HashSet<(T, T)> AllPairs<T>(this IEnumerable<T> elements, bool includeIdentities = true)
+    {
+        var result = new HashSet<(T, T)>();
+
+        foreach (var e1 in elements)
+        {
+            foreach (var e2 in elements)
+            {
+                if (includeIdentities || !EqualityComparer<T>.Default.Equals(e1, e2))
+                {
+                    if (!result.Contains((e1, e2)) && !result.Contains((e2, e1)))
+                    {
+                        result.Add((e1, e2));
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     public static IEnumerable<(T value, int idx)> WithIndex<T>(this IEnumerable<T> elements)
     {
         return elements.Select((n, idx) => (n, idx));
