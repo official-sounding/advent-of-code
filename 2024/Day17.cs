@@ -8,123 +8,128 @@ public class Day202417 : AsyncProblem
             A = Convert.ToInt32(input[0].Replace("Register A: ", "")),
             B = Convert.ToInt32(input[1].Replace("Register B: ", "")),
             C = Convert.ToInt32(input[2].Replace("Register C: ", "")),
-            Program = input[4].Replace("Program: ","").Split(',').SelectMany(s => s.ToCharArray()).ToArray(),
+            Program = ParseProgram(input[4]),
             ExampleMode = ExampleMode
         };
 
-        return Task.FromResult(computer.RunProgram());
+        return Task.FromResult(string.Join(',', computer.RunProgram()));
+    }
+
+    public override Task<string> RunPartTwoAsync(string[] input)
+    {
+        var program = ParseProgram(input[4]);
+        long regA = 0;
+
+        var computer = new Computer()
+        {
+            Program = program,
+            ExampleMode = ExampleMode
+        };
+
+        while (true)
+        {
+            computer.A = regA;
+            var output = computer.RunProgram();
+
+            // take last (output.length) digits of program for comparison
+            var n = program.Length - output.Count;
+
+            bool match = program[n..]
+                .Zip(output)
+                .All((pair) => pair.First == pair.Second);
+
+            if (match)
+            {
+                if (output.Count == program.Length)
+                {
+                    return Task.FromResult($"{regA}");
+                }
+                regA <<= 3;
+            }
+            else
+            {
+                regA++;
+            }
+        }
+    }
+
+    int[] ParseProgram(string programStr)
+    {
+        return programStr[9..]
+            .Split(',')
+            .SelectMany(s => s.ToCharArray())
+            .Select(c => int.Parse($"{c}"))
+            .ToArray();
     }
 }
 
 public class Computer
 {
-    public int A { get; set; }
-    public int B { get; set; }
-    public int C { get; set; }
-    public required char[] Program { get; set; }
+    public long A { get; set; }
+    public long B { get; set; }
+    public long C { get; set; }
+    public required int[] Program { get; set; }
     public bool ExampleMode { get; set; }
-    private List<int> _outputs = [];
-    private int _ip = 0;
+    private List<long> _outputs = [];
+    private long _ip = 0;
 
-    private int ComboOperand(char o) => o switch
+    private long CO(int o) => o switch
     {
-        '0' => 0,
-        '1' => 1,
-        '2' => 2,
-        '3' => 3,
-        '4' => A,
-        '5' => B,
-        '6' => C,
+        <= 3 => o,
+        4 => A,
+        5 => B,
+        6 => C,
         _ => throw new Exception($"{o} is invalid combo operand")
     };
 
-    private int LiteralOperand(char o) => Convert.ToInt32($"{o}");
-
-    public string RunProgram()
+    private long Div(int operand)
     {
+        var numerator = A;
+        var denominator = 1L << (int)CO(operand);
+        return numerator / denominator;
+    }
+
+    public List<long> RunProgram()
+    {
+        _ip = 0;
+        _outputs = [];
         while (_ip < Program.Length - 1)
         {
             var op = Program[_ip++];
-            var operand = Program[_ip++];
+            var o = Program[_ip++];
 
             switch (op)
             {
-                case '0':
-                    { //adv
-                        OutputInstruction("adv", ComboOperand(operand));
-                        var numerator = A;
-                        var denominator = (long)Math.Pow(2, ComboOperand(operand));
+                case 0:
+                    A = Div(o);
+                    break;
+                case 1:
+                    B ^= o;
+                    break;
+                case 2:
+                    B = CO(o) % 8;
+                    break;
 
-                        var result = numerator / denominator;
-                        A = unchecked((int)(uint)(result & uint.MaxValue));
-                        break;
-                    }
-                case '1':
+                case 3:
+                    if (A != 0)
                     {
-                        OutputInstruction("bxl", LiteralOperand(operand));
-                        B ^= LiteralOperand(operand);
-                        break;
+                        _ip = o;
                     }
-                case '2':
-                    {
-                        OutputInstruction("bst", ComboOperand(operand));
-                        B = ComboOperand(operand) % 8;
-                        break;
-                    }
-
-                case '3':
-                    {
-                        OutputInstruction("jnz", LiteralOperand(operand));
-                        if (A != 0)
-                        {
-
-                            _ip = LiteralOperand(operand);
-                        }
-                        break;
-                    }
-                case '4':
-                    {
-                        OutputInstruction("bxc", LiteralOperand(operand));
-                        B ^= C;
-                        break;
-                    }
-                case '5':
-                    {
-                        OutputInstruction("out", ComboOperand(operand));
-
-                        _outputs.Add(ComboOperand(operand) % 8);
-                        break;
-                    }
-                case '6':
-                    {
-                        OutputInstruction("bdv", ComboOperand(operand));
-                        var numerator = A;
-                        var denominator = (long)Math.Pow(2, ComboOperand(operand));
-
-                        var result = numerator / denominator;
-                        B = unchecked((int)(uint)(result & uint.MaxValue));
-                        break;
-                    }
-                case '7':
-                    {
-                        OutputInstruction("cdv", ComboOperand(operand));
-                        var numerator = A;
-                        var denominator = (long)Math.Pow(2, ComboOperand(operand));
-
-                        var result = numerator / denominator;
-                        C = unchecked((int)(uint)(result & uint.MaxValue));
-                        break;
-                    }
+                    break;
+                case 4:
+                    B ^= C;
+                    break;
+                case 5:
+                    _outputs.Add(CO(o) % 8);
+                    break;
+                case 6:
+                    B = Div(o);
+                    break;
+                case 7:
+                    C = Div(o);
+                    break;
             }
         }
-        return string.Join(',', _outputs);
-    }
-
-    void OutputInstruction(string inst, int op)
-    {
-        if (ExampleMode)
-        {
-            Console.WriteLine($"{inst} {op,10}");
-        }
+        return _outputs;
     }
 }
