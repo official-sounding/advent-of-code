@@ -57,6 +57,9 @@ public class Matrix : IEnumerable<KeyValuePair<Position, char>>
     public int MaxX { get; init; }
     public int MaxY { get; init; }
 
+    public IEnumerable<int> XValues => Enumerable.Range(0, MaxX + 1);
+    public IEnumerable<int> YValues => Enumerable.Range(0, MaxY + 1);
+
     public bool TryGetValue(Position position, out char value)
     {
         return _matrix.TryGetValue(position, out value);
