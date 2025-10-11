@@ -9,7 +9,7 @@ public class Day202307 : Problem
     public Day202307()
     {
         cardRank = cardOrder.Select((c, idx) => (c, idx)).ToDictionary((k) => k.c, k => k.idx);
-        cardRankWithJoker = cardOrder.Select((c, idx) => (c, idx)).ToDictionary((k) => k.c, k => k.idx);
+        cardRankWithJoker = cardOrderithJoker.Select((c, idx) => (c, idx)).ToDictionary((k) => k.c, k => k.idx);
     }
 
     public override long RunPartOne(string[] input)
@@ -18,13 +18,30 @@ public class Day202307 : Problem
         {
             var hand = parts[0];
             var bid = Convert.ToInt32(parts[1]);
-            var type = CalcHandType(hand);
             var sort = CalcHandSort(hand, false);
 
             return new Hand(hand, sort, bid);
         })
             .OrderBy(h => h.sort)
             .Select((h, idx) => (h, idx + 1))
+            .Sum(h => h.h.bid * h.Item2);
+    }
+
+    public override long RunPartTwo(string[] input)
+    {
+        return input.Select(r => r.Split(" ")).Select(parts =>
+        {
+            var hand = parts[0];
+            var bid = Convert.ToInt32(parts[1]);
+            var sort = CalcHandSort(hand, true);
+
+            return new Hand(hand, sort, bid);
+        })
+            .OrderBy(h => h.sort)
+            .Select((h, idx) =>
+            {
+                return (h, idx + 1);
+            })
             .Sum(h => h.h.bid * h.Item2);
     }
 
@@ -52,13 +69,33 @@ public class Day202307 : Problem
         return HandType.HighCard;
     }
 
+    HandType CalcHandTypeWithJoker(string hand)
+    {
+        if (!hand.Any(h => h == 'J'))
+        {
+            return CalcHandType(hand);
+        }
+
+        if (hand.All(h => h == 'J'))
+        {
+            return HandType.FiveOfAKind;
+        }
+
+        var scenarios = hand.Distinct().Where(h => h != 'J').Select(h => hand.Replace('J', h)).ToArray();
+
+        var result = scenarios.Select(CalcHandType).Max();
+
+        return result;
+    }
+
     int CalcHandSort(string hand, bool withJoker)
     {
-        var result = (int)CalcHandType(hand);
+        var result = (int)(withJoker ? CalcHandTypeWithJoker(hand) : CalcHandType(hand));
+        var ranks = withJoker ? cardRankWithJoker : cardRank;
         foreach (var c in hand)
         {
             result <<= 4;
-            result |= cardRank[c];
+            result |= ranks[c];
 
         }
         return result;
