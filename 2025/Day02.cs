@@ -1,5 +1,7 @@
+using System.Text.RegularExpressions;
+
 [Slug(2025, 2)]
-public class Day202502 : Problem
+public partial class Day202502 : Problem
 {
     public override long RunPartOne(string[] input)
     {
@@ -7,37 +9,41 @@ public class Day202502 : Problem
 
         var ranges = line.Split(",");
 
-        var total = 0L;
-        foreach (var range in ranges)
+        return ranges.Sum(range =>
         {
-            var split = range.ToLongList('-').ToArray();
-            var i = split[0] - 1;
-            var max = split[1];
+            var (start, end)  = NumberUtils.SplitRangeString(range);
+            return NumberUtils.InRange(start, end).Where(IsDuped).Sum();
+        });
+    }
 
+    public override long RunPartTwo(string[] input)
+    {
+        var line = input[0];
 
-            while (i++ < max)
-            {
-                if (IsDuped(i))
-                {
-                    total += i;
-                }
-            }
-        }
+        var ranges = line.Split(",");
+        return ranges.Sum(range =>
+        {
+            var (start, end)  = NumberUtils.SplitRangeString(range);
+            return NumberUtils.InRange(start, end).Where(IsRepeating).Sum();
+        });
 
-        return total;
     }
 
     private bool IsDuped(long i)
     {
-        var asStr = $"{i}";
-        if (asStr.Length % 2 != 0)
-        {
-            return false;
-        }
-
-        var start = asStr[..(asStr.Length / 2)];
-        var end = asStr[(asStr.Length / 2)..];
-
-        return start == end;
+        return RepeatsOnce().IsMatch($"{i}");
     }
+
+    private bool IsRepeating(long i)
+    {
+        
+        var asStr = $"{i}";
+        return RepeatingSeq().IsMatch(asStr);
+    }
+
+    [GeneratedRegex(@"^(\d+)\1$")]
+    private static partial Regex RepeatsOnce();
+
+    [GeneratedRegex(@"^(\d+)\1+$")]
+    private static partial Regex RepeatingSeq();
 }
