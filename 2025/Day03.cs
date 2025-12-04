@@ -3,23 +3,43 @@ public class Day202503 : Problem
 {
     public override long RunPartOne(string[] input)
     {
-        return input.Select(MaxJoltage).Sum();
+        return input.Select((b) => MaxJolt(b, 2)).Sum();
     }
 
-    private static int MaxJoltage(string line)
+    public override long RunPartTwo(string[] input)
     {
-        var max = -1;
-        foreach (var (ch, idx) in line.WithIndex().Take(line.Length - 1))
+        return input.Select((b) => MaxJolt(b, 12)).Sum();
+    }
+
+    private static long MaxJolt(string bank, int nrOfBatteries)
+    {
+        var jolt = 0L;
+        var index = 0;
+
+        while (nrOfBatteries-- > 0)
         {
-            var nextlg = line.Skip(idx + 1).Max();
-            var num = int.Parse($"{ch}{nextlg}");
-            if (num > max)
+            var (atIndex, digit) = GetMaxDigitFrom(bank, index, nrOfBatteries);
+            jolt = jolt * 10 + digit.ToInt();
+            index = atIndex + 1;
+        }
+
+        return jolt;
+    }
+
+    private static (int index, char digit) GetMaxDigitFrom(string bank, int startIndex, int endIndex)
+    {
+        var maxDigit = '0';
+        var index = -1;
+        foreach (var (c, i) in bank.Skip(startIndex).Take(bank.Length - endIndex).WithIndex())
+        {
+            if (c > maxDigit)
             {
-                max = num;
+                maxDigit = c;
+                index = i;
             }
         }
 
-        return max;
+        return (index, maxDigit);
     }
 
 
