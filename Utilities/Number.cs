@@ -14,16 +14,16 @@ public class NumberUtils
 
     public static IEnumerable<long> InRange(long start, long end)
     {
-        var i = start -1;
+        var i = start - 1;
         while (i++ < end)
         {
             yield return i;
         }
     }
 
-    public static (long, long) SplitRangeString(string rangeStr)
+    public static LongRange SplitRangeString(string rangeStr)
     {
         var split = rangeStr.ToLongList('-').ToArray();
-        return (split[0], split[1]);
+        return new LongRange(split[0], split[1]);
     }
 }
