@@ -1,3 +1,5 @@
+using System.Text;
+
 public static class IEnumerableExtensions
 {
     public static long GreatestCommonDenominator(long n1, long n2)
@@ -70,5 +72,29 @@ public static class IEnumerableExtensions
             yield return selector(last, cur);
             last = cur;
         }
+    }
+
+    public static IEnumerable<string> AsColumns(this IEnumerable<string> rows)
+    {
+        int numColumns = rows.Max(x => x.Length);
+
+        var res = new string[numColumns];
+        for (int i = 0; i < numColumns; i++)
+        {
+            StringBuilder sb = new();
+            foreach (var row in rows)
+            {
+                try
+                {
+                    sb.Append(row[i]);
+                }
+                catch (IndexOutOfRangeException)
+                {
+                    sb.Append(' ');
+                }
+            }
+            res[i] = sb.ToString();
+        }
+        return res;
     }
 }
