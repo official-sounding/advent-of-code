@@ -144,6 +144,7 @@ public record Position(int X, int Y)
     }
 
     public int ManhattanDistance(Position b) => Math.Abs(X - b.X) + Math.Abs(Y - b.Y);
+    public long SquaredEuclidean(Position b) => (long)(Math.Pow(X - b.X, 2) + Math.Pow(Y - b.Y, 2));
 
     public override string ToString() => $"({X},{Y})";
 
