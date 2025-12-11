@@ -146,6 +146,9 @@ public record Position(int X, int Y)
     public int ManhattanDistance(Position b) => Math.Abs(X - b.X) + Math.Abs(Y - b.Y);
     public long SquaredEuclidean(Position b) => (long)(Math.Pow(X - b.X, 2) + Math.Pow(Y - b.Y, 2));
 
+    public bool HorizontalInline(Position b) => Y == b.Y;
+    public bool VerticalInline(Position b) => X == b.X;
+
     public override string ToString() => $"({X},{Y})";
 
     public static Position operator -(Position me, Position other) => new(Y: me.Y - other.Y, X: me.X - other.X);

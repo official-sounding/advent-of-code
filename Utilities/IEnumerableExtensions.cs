@@ -97,4 +97,31 @@ public static class IEnumerableExtensions
         }
         return res;
     }
+
+    public static IEnumerable<T> CountIterations<T>(this IEnumerable<T> e, bool print)
+    {
+        foreach (var (item, idx) in e.WithIndex())
+        {
+            if (print)
+            {
+                if (idx % 1000 == 0)
+                {
+                    Console.WriteLine("!");
+                }
+                else if (idx % 100 == 0)
+                {
+                    Console.Write("+");
+                }
+                else if (idx % 10 == 0)
+                {
+                    Console.Write(".");
+                }
+            }
+            yield return item;
+        }
+        if (print)
+        {
+            Console.WriteLine();
+        }
+    }
 }
